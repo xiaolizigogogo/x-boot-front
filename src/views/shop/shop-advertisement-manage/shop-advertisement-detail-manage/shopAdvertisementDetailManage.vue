@@ -7,7 +7,7 @@
             <Col>
                 <Card>
                     <Row class="operation">
-                        <Button @click="addRole" type="primary" icon="plus-round">添加角色</Button>
+                        <Button @click="addRole" type="primary" icon="plus-round">添加广告</Button>
                         <Button @click="delAll" type="ghost" icon="trash-a">批量删除</Button>
                         <Button @click="init" type="ghost" icon="refresh">刷新</Button>
                     </Row>
@@ -28,8 +28,20 @@
         </Row>
         <Modal :title="modalTitle" v-model="roleModalVisible" :mask-closable='false' :width="500">
           <Form ref="roleForm" :model="roleForm" :label-width="80" :rules="roleFormValidate">
-            <FormItem label="角色名称" prop="name">
-              <Input v-model="roleForm.name" placeholder="按照Spring Security约定建议以‘ROLE_’开头"/>
+            <FormItem label="名称" prop="name">
+              <Input v-model="roleForm.name" placeholder="名称"/>
+            </FormItem>
+            <FormItem label="描述" prop="name">
+              <Input v-model="roleForm.content" placeholder="描述"/>
+            </FormItem>
+            <FormItem label="图片链接" prop="name">
+              <Input v-model="roleForm.imageUrl" placeholder="图片链接"/>
+            </FormItem>
+            <FormItem label="广告链接" prop="name">
+              <Input v-model="roleForm.link" placeholder="广告链接"/>
+            </FormItem>
+            <FormItem label="结束时间" prop="name">
+              <Input v-model="roleForm.endTime" placeholder="结束时间"/>
             </FormItem>
           </Form>
           <div slot="footer">
@@ -65,7 +77,13 @@ export default {
       permModalVisible: false,
       modalTitle: "",
       roleForm: {
-        name: ""
+        name: "",
+        imageUrl:"",
+        enabled:1,
+        link:"",
+        endTime:"",
+        mediaType:1,
+        adPositionId:this.$route.query.id
       },
       roleFormValidate: {
         name: [{ required: true, message: "角色名称不能为空", trigger: "blur" }]
@@ -80,48 +98,39 @@ export default {
           align: "center"
         },
         {
-          title: "订单编号",
-          key: "orderSn",
+          title: "编号",
+          key: "id",
           sortable: true
         },
+
         {
-          title: "创建时间",
-          key: "addTime",
+          title: "名称",
+          key: "name",
+          align: "center",
+        },
+        {
+          title: "结束时间",
+          key: "endTime",
           sortable: true,
           sortType: "desc",
           render:(h,params)=>{
             return h('div',
-              formatDate(new Date(params.row.addTime*1000)));/*这里的this.row能够获取当前行的数据*/
+              formatDate(new Date(params.row.endTime*1000)));/*这里的this.row能够获取当前行的数据*/
           }
         },
         {
-          title: "确认时间",
-          key: "confirmTime",
-          sortable: true,
-          render:(h,params)=>{
-            return h('div',
-              params.row.confirmTime?
-              formatDate(new Date(params.row.confirmTime*1000)):"-");/*这里的this.row能够获取当前行的数据*/
-          }
-        },
-        {
-          title: "支付状态",
-          key: "payStatus",
+          title: "描述",
+          key: "content",
           align: "center",
         },
         {
-          title: "订单状态",
-          key: "orderStatus",
+          title: "图片链接",
+          key: "imageUrl",
           align: "center",
         },
         {
-          title: "快递状态",
-          key: "shippingStatus",
-          align: "center",
-        },
-        {
-          title: "订单金额",
-          key: "orderPrice",
+          title: "广告链接",
+          key: "link",
           align: "center",
         },
         {
@@ -131,24 +140,6 @@ export default {
           width: 300,
           render: (h, params) => {
             return h("div", [
-              h(
-                "Button",
-                {
-                  props: {
-                    type: "warning",
-                    size: "small"
-                  },
-                  style: {
-                    marginRight: "5px"
-                  },
-                  on: {
-                    click: () => {
-                      this.editPerm(params.row);
-                    }
-                  }
-                },
-                "分配权限"
-              ),
               h(
                 "Button",
                 {

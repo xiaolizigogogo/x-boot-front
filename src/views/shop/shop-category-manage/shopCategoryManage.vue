@@ -190,113 +190,40 @@ export default {
           align: "center"
         },
         {
-          title: "用户名",
-          key: "username",
+          title: "编号",
+          key: "id",
           width: 150,
           sortable: true
         },
         {
-          title: "手机",
-          key: "mobile",
+          title: "名称",
+          key: "name",
           width: 110,
           sortable: true
         },
         {
-          title: "邮箱",
-          key: "email",
+          title: "父类型",
+          key: "parentId",
+          width: 110,
+          sortable: true
+        },
+        {
+          title: "是否显示",
+          key: "isShow",
+          width: 110,
+          sortable: true
+        },
+        {
+          title: "排序值",
+          key: "sortOrder",
           width: 200,
           sortable: true
         },
         {
-          title: "性别",
-          key: "sex",
-          width: 70,
-          align: "center",
-          render: (h, params) => {
-            let re = "";
-            if (params.row.sex === 1) {
-              re = "男";
-            } else if (params.row.sex === 0) {
-              re = "女";
-            }
-            return h("div", re);
-          }
-        },
-        {
-          title: "用户类型",
-          key: "type",
-          align: "center",
-          width: 100,
-          render: (h, params) => {
-            let re = "";
-            if (params.row.type === 1) {
-              re = "管理员";
-            } else if (params.row.type === 0) {
-              re = "普通用户";
-            }
-            return h("div", re);
-          }
-        },
-        {
-          title: "状态",
-          key: "status",
-          align: "center",
-          width: 180,
-          render: (h, params) => {
-            let re = "";
-            if (params.row.status === 0) {
-              return h("div", [
-                h(
-                  "Tag",
-                  {
-                    props: {
-                      type: "dot",
-                      color: "green"
-                    }
-                  },
-                  "正常启用"
-                )
-              ]);
-            } else if (params.row.status === -1) {
-              return h("div", [
-                h(
-                  "Tag",
-                  {
-                    props: {
-                      type: "dot",
-                      color: "red"
-                    }
-                  },
-                  "禁用"
-                )
-              ]);
-            }
-          },
-          filters: [
-            {
-              label: "正常启用",
-              value: 0
-            },
-            {
-              label: "禁用",
-              value: -1
-            }
-          ],
-          filterMultiple: false,
-          filterMethod(value, row) {
-            if (value === 0) {
-              return row.status === 0;
-            } else if (value === -1) {
-              return row.status === -1;
-            }
-          }
-        },
-        {
-          title: "创建时间",
-          key: "createTime",
-          sortable: true,
-          sortType: "desc",
-          width: 150
+          title: "图片链接",
+          key: "wapBannerUrl",
+          width: 200,
+          sortable: true
         },
         {
           title: "操作",

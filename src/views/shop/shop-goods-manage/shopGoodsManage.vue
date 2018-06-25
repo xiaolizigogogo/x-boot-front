@@ -11,14 +11,14 @@
                         <Input type="text" v-model="searchKey" clearable placeholder="请输入搜索关键词" style="width: 300px"/>
                       </Form-item>
                       <Form-item style="margin-left:-35px;">
-                        <Button @click="getLogList"  type="primary" icon="search">搜索</Button>
-                        <Button @click="handleReset" type="ghost" >重置</Button>
+                        <Button @click="loadData"  type="primary" icon="search">搜索</Button>
+                        <Button @click="loadData" type="ghost" >重置</Button>
                       </Form-item>
                     </Form>
                     <Row class="operation">
-                      <Button @click="clearAll" type="error" icon="trash-a">清空全部</Button>
-                      <Button @click="delAll" type="ghost" icon="trash-a">批量删除</Button>
-                      <Button @click="getLogList" type="ghost" icon="refresh">刷新</Button>
+                      <Button @click="clearAll" type="primary" icon="ivu-icon ivu-icon-plus-round">添加商品</Button>
+                      <Button @click="delAll" type="error" icon="trash-a">批量删除</Button>
+                      <Button @click="loadData" type="ghost" icon="refresh">刷新</Button>
                     </Row>
                      <Row>
                         <Alert show-icon>
@@ -56,8 +56,38 @@ export default {
           align: "center"
         },
         {
-          title: "操作名称",
+          title: "商品编号",
+          key: "goodsSn",
+          width: 110,
+          sortable: true
+        },
+        {
+          title: "商品名称",
           key: "name",
+          width: 110,
+          sortable: true
+        },
+        {
+          title: "是否在售",
+          key: "isOnSale",
+          width: 110,
+          sortable: true
+        },
+        {
+          title: "是否删除",
+          key: "isOnSale",
+          width: 110,
+          sortable: true
+        },
+        {
+          title: "零售价格",
+          key: "retailPrice",
+          width: 110,
+          sortable: true
+        },
+        {
+          title: "销售库存",
+          key: "sellVolume",
           width: 110,
           sortable: true
         },
@@ -196,11 +226,11 @@ export default {
     },
     changePage(v) {
       this.pageNumber = v;
-      this.getLogList();
+      this.loadData();
     },
     changePageSize(v) {
       this.pageSize = v;
-      this.getLogList();
+      this.loadData();
     },
     loadData() {
       this.loading = true;

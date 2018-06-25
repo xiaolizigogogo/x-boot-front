@@ -7,8 +7,8 @@
             <Col>
                 <Card>
                     <Row class="operation">
-                        <Button @click="addRole" type="primary" icon="plus-round">添加角色</Button>
-                        <Button @click="delAll" type="ghost" icon="trash-a">批量删除</Button>
+                        <!--<Button @click="addRole" type="primary" icon="plus-round">添加广告位置</Button>-->
+                        <!--<Button @click="delAll" type="ghost" icon="trash-a">批量删除</Button>-->
                         <Button @click="init" type="ghost" icon="refresh">刷新</Button>
                     </Row>
                      <Row>
@@ -80,49 +80,15 @@ export default {
           align: "center"
         },
         {
-          title: "订单编号",
-          key: "orderSn",
+          title: "编号",
+          key: "id",
           sortable: true
         },
         {
-          title: "创建时间",
-          key: "addTime",
+          title: "名称",
+          key: "name",
           sortable: true,
           sortType: "desc",
-          render:(h,params)=>{
-            return h('div',
-              formatDate(new Date(params.row.addTime*1000)));/*这里的this.row能够获取当前行的数据*/
-          }
-        },
-        {
-          title: "确认时间",
-          key: "confirmTime",
-          sortable: true,
-          render:(h,params)=>{
-            return h('div',
-              params.row.confirmTime?
-              formatDate(new Date(params.row.confirmTime*1000)):"-");/*这里的this.row能够获取当前行的数据*/
-          }
-        },
-        {
-          title: "支付状态",
-          key: "payStatus",
-          align: "center",
-        },
-        {
-          title: "订单状态",
-          key: "orderStatus",
-          align: "center",
-        },
-        {
-          title: "快递状态",
-          key: "shippingStatus",
-          align: "center",
-        },
-        {
-          title: "订单金额",
-          key: "orderPrice",
-          align: "center",
         },
         {
           title: "操作",
@@ -143,11 +109,11 @@ export default {
                   },
                   on: {
                     click: () => {
-                      this.editPerm(params.row);
+                      this.edit(params.row);
                     }
                   }
                 },
-                "分配权限"
+                "编辑"
               ),
               h(
                 "Button",
@@ -168,7 +134,7 @@ export default {
                     }
                   }
                 },
-                "编辑"
+                "广告编辑"
               ),
               h(
                 "Button",

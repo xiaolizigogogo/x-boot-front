@@ -51,7 +51,7 @@
                         </Form>
                     </TabPane>
                 </Tabs>
-            
+
                 <Row type="flex" justify="space-between" class="code-row-bg">
                     <Checkbox v-model="saveLogin" size="large">自动登录</Checkbox>
                     <a class="forget-pass" @click="showAccount">忘记密码</a>

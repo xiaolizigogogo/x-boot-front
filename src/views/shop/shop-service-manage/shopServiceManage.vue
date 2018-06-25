@@ -7,7 +7,7 @@
             <Col>
                 <Card>
                     <Row class="operation">
-                        <Button @click="addRole" type="primary" icon="plus-round">添加角色</Button>
+                        <Button @click="addRole" type="primary" icon="plus-round">添加服务项目</Button>
                         <Button @click="delAll" type="ghost" icon="trash-a">批量删除</Button>
                         <Button @click="init" type="ghost" icon="refresh">刷新</Button>
                     </Row>
@@ -27,9 +27,18 @@
             </Col>
         </Row>
         <Modal :title="modalTitle" v-model="roleModalVisible" :mask-closable='false' :width="500">
-          <Form ref="roleForm" :model="roleForm" :label-width="80" :rules="roleFormValidate">
-            <FormItem label="角色名称" prop="name">
-              <Input v-model="roleForm.name" placeholder="按照Spring Security约定建议以‘ROLE_’开头"/>
+          <Form ref="serviceForm" :model="serviceForm" :label-width="80" :rules="serviceFormValidate">
+            <FormItem label="项目名称" prop="name">
+              <Input v-model="serviceForm.name" placeholder="项目中文名称"/>
+            </FormItem>
+            <FormItem label="项目英文" prop="code">
+              <Input v-model="serviceForm.code" placeholder="项目英文"/>
+            </FormItem>
+            <FormItem label="项目介绍" prop="memo">
+              <Input v-model="serviceForm.memo" placeholder="项目介绍"/>
+            </FormItem>
+            <FormItem label="项目图片" prop="image">
+              <Input v-model="serviceForm.image" placeholder="项目图片"/>
             </FormItem>
           </Form>
           <div slot="footer">
@@ -63,10 +72,13 @@ export default {
       roleModalVisible: false,
       permModalVisible: false,
       modalTitle: "",
-      roleForm: {
-        name: ""
+      serviceForm: {
+        name: "",
+        code: "",
+        memo:"",
+        image:""
       },
-      roleFormValidate: {
+      serviceFormValidate: {
         name: [{ required: true, message: "角色名称不能为空", trigger: "blur" }]
       },
       submitLoading: false,
@@ -79,24 +91,24 @@ export default {
           align: "center"
         },
         {
-          title: "角色名称",
+          title: "服务名称",
           key: "name",
           sortable: true
         },
         {
           title: "创建时间",
-          key: "createTime",
+          key: "gmtCreate",
           sortable: true,
           sortType: "desc"
         },
         {
           title: "更新时间",
-          key: "updateTime",
+          key: "gmtModify",
           sortable: true
         },
         {
-          title: "是否设置为注册用户默认角色",
-          key: "defaultRole",
+          title: "是否有效",
+          key: "enable",
           align: "center",
           render: (h, params) => {
             if (params.row.defaultRole) {
@@ -117,7 +129,7 @@ export default {
                       }
                     }
                   },
-                  "取消默认"
+                  "设为无效"
                 )
               ]);
             } else {
@@ -138,7 +150,7 @@ export default {
                       }
                     }
                   },
-                  "设为默认"
+                  "设为有效"
                 )
               ]);
             }
@@ -270,7 +282,7 @@ export default {
       this.roleModalVisible = false;
     },
     submitRole() {
-      this.$refs.roleForm.validate(valid => {
+      this.$refs.serviceForm.validate(valid => {
         if (valid) {
           let url = "/role/save";
           if (this.modalType === 1) {
@@ -278,7 +290,7 @@ export default {
             url = "/role/edit";
           }
           this.submitLoading = true;
-          this.postRequest(url, this.roleForm).then(res => {
+          this.postRequest(url, this.serviceForm).then(res => {
             this.submitLoading = false;
             if (res.success === true) {
               this.$Message.success("操作成功");
@@ -291,8 +303,8 @@ export default {
     },
     addRole() {
       this.modalType = 0;
-      this.modalTitle = "添加角色";
-      this.roleForm = {
+      this.modalTitle = "添加服务项目";
+      this.serviceForm = {
         name: "",
         access: null
       };
@@ -308,8 +320,8 @@ export default {
         }
       }
       let str = JSON.stringify(v);
-      let roleInfo = JSON.parse(str);
-      this.roleForm = roleInfo;
+      let serviceInfo = JSON.parse(str);
+      this.serviceForm = serviceInfo;
       this.roleModalVisible = true;
     },
     remove(v) {

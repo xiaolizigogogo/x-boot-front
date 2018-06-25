@@ -3,271 +3,419 @@
 </style>
 <template>
     <div class="search">
-        <Row>
-            <Col>
-                <Card>
-                    <Form inline :label-width="70" class="search-form">
-                      <Form-item label="搜索日志">
-                        <Input type="text" v-model="searchKey" clearable placeholder="请输入搜索关键词" style="width: 300px"/>
-                      </Form-item>
-                      <Form-item style="margin-left:-35px;">
-                        <Button @click="getLogList"  type="primary" icon="search">搜索</Button>
-                        <Button @click="handleReset" type="ghost" >重置</Button>
-                      </Form-item>
-                    </Form>
-                    <Row class="operation">
-                      <Button @click="clearAll" type="error" icon="trash-a">清空全部</Button>
-                      <Button @click="delAll" type="ghost" icon="trash-a">批量删除</Button>
-                      <Button @click="getLogList" type="ghost" icon="refresh">刷新</Button>
-                    </Row>
-                     <Row>
-                        <Alert show-icon>
-                            已选择 <span class="select-count">{{selectCount}}</span> 项
-                            <a class="select-clear" @click="clearSelectAll">清空</a>
-                        </Alert>
-                    </Row>
-                    <Row class="margin-top-10 searchable-table-con1">
-                        <Table :loading="loading" border :columns="columns" :data="data" ref="table" sortable="custom" @on-sort-change="changeSort" @on-selection-change="changeSelect"></Table>
-                    </Row>
-                    <Row type="flex" justify="end" class="code-row-bg page">
-                        <Page :current="this.pageNumber" :total="total" :page-size="this.pageSize" @on-change="changePage" @on-page-size-change="changePageSize" :page-size-opts="[10,20,50,100]" size="small" show-total show-elevator show-sizer></Page>
-                    </Row>
-                </Card>
+        <Card>
+          <Row class="operation">
+            <Button @click="addMenu" type="primary" icon="plus-round">添加子节点</Button>
+            <Button @click="addRootMenu" type="ghost" icon="plus-round">添加一级菜单</Button>
+            <Button @click="delAll" type="ghost" icon="trash-a">批量删除</Button>
+            <Dropdown @on-click="handleDropdown">
+              <Button type="ghost">
+                更多操作
+                <Icon type="arrow-down-b"></Icon>
+              </Button>
+              <DropdownMenu slot="list">
+                <DropdownItem name="refresh">刷新</DropdownItem>
+                <DropdownItem name="expandTwo">仅展开两级</DropdownItem>
+                <DropdownItem name="expandAll">展开所有</DropdownItem>
+              </DropdownMenu>
+            </Dropdown>
+          </Row>
+          <Row type="flex" justify="start" class="code-row-bg">
+            <Col span="6">
+              <Tree :data="data" show-checkbox @on-check-change="changeSelect" @on-select-change="selectTree"></Tree>
+              <Spin size="large" fix v-if="loading"></Spin>
             </Col>
-        </Row>
+            <Col span="9">
+              <Form ref="menuForm" :model="menuForm" :label-width="85" :rules="menuFormValidate">
+                <FormItem label="类型" prop="type">
+                  <RadioGroup v-model="menuForm.type">
+                    <Radio :label="0">
+                      <Icon type="ios-list-outline"></Icon>
+                      <span>页面菜单</span>
+                    </Radio>
+                    <Radio :label="1" :disabled="isMenu">
+                      <Icon type="log-in"></Icon>
+                      <span>操作按钮</span>
+                    </Radio>
+                  </RadioGroup>
+                </FormItem>
+                 <FormItem label="名称" prop="title">
+                  <Input v-model="menuForm.title"/>
+                </FormItem>
+                <FormItem label="路径" prop="path">
+                  <Input v-model="menuForm.path"/>
+                </FormItem>
+                <FormItem label="按钮权限类型" prop="buttonType" v-if="menuForm.type===1">
+                  <Select v-model="menuForm.buttonType" placeholder="请选择">
+                    <Option value="add">添加操作</Option>
+                    <Option value="edit">编辑操作</Option>
+                    <Option value="delete">删除操作</Option>
+                    <Option value="clearAll">清空全部</Option>
+                    <Option value="enable">启用操作</Option>
+                    <Option value="disable">禁用操作</Option>
+                    <Option value="search">搜索操作</Option>
+                    <Option value="output">导出操作</Option>
+                    <Option value="editPerm">分配权限</Option>
+                    <Option value="setDefault">设为默认</Option>
+                  </Select>
+                </FormItem>
+                <div v-if="menuForm.type===0">
+                  <FormItem label="英文名" prop="name">
+                    <Input v-model="menuForm.name"/>
+                  </FormItem>
+                  <FormItem label="图标" prop="icon" style="margin-bottom: 5px;">
+                    <Input v-model="menuForm.icon"/>
+                    <span>
+                      图标请参考 <a target="_blank" href="http://ionicons.com/"><Icon type="ionic"></Icon> ionicons</a>
+                    </span>
+                  </FormItem>
+                  <FormItem label="前端组件" prop="component">
+                    <Input v-model="menuForm.component"/>
+                  </FormItem>
+                </div>
+                <FormItem label="排序值" prop="sortOrder">
+                  <InputNumber :max="1000" :min="0" v-model="menuForm.sortOrder"></InputNumber>
+                  <span style="margin-left:5px">值越小越靠前，支持小数</span>
+                </FormItem>
+                <FormItem label="是否启用" prop="status">
+                  <i-switch size="large" v-model="editStatus" @on-change="changeEditSwitch">
+                    <span slot="open">启用</span>
+                    <span slot="close">禁用</span>
+                  </i-switch>
+                </FormItem>
+                <Form-item>
+                  <Button @click="submitEdit" :loading="submitLoading" type="primary" icon="compose">修改</Button>
+                  <Button @click="handleReset" type="ghost" >重置</Button>
+                </Form-item>
+              </Form>
+            </Col>
+          </Row>
+        </Card>
+
+        <Modal :title="modalTitle" v-model="menuModalVisible" :mask-closable='false' :width="500">
+          <Form ref="menuFormAdd" :model="menuFormAdd" :label-width="85" :rules="menuFormValidate">
+            <div v-if="showParent">
+              <FormItem label="上级节点：">
+                {{menuForm.title}}
+              </FormItem>
+            </div>
+            <FormItem label="类型" prop="type">
+              <RadioGroup v-model="menuFormAdd.type">
+                <Radio :label="0" :disabled="isButtonAdd">
+                  <Icon type="ios-list-outline"></Icon>
+                  <span>页面菜单</span>
+                </Radio>
+                <Radio :label="1" :disabled="isMenuAdd">
+                  <Icon type="log-in"></Icon>
+                  <span>操作按钮</span>
+                </Radio>
+              </RadioGroup>
+            </FormItem>
+            <FormItem label="名称" prop="title">
+              <Input v-model="menuFormAdd.title"/>
+            </FormItem>
+            <FormItem label="路径" prop="path">
+              <Input v-model="menuFormAdd.path"/>
+            </FormItem>
+            <FormItem label="按钮权限类型" prop="buttonType" v-if="menuFormAdd.type===1">
+              <Select v-model="menuFormAdd.buttonType" placeholder="请选择">
+                <Option value="add">添加操作</Option>
+                <Option value="edit">编辑操作</Option>
+                <Option value="delete">删除操作</Option>
+                <Option value="clearAll">清空全部</Option>
+                <Option value="enable">启用操作</Option>
+                <Option value="disable">禁用操作</Option>
+                <Option value="search">搜索操作</Option>
+                <Option value="output">导出操作</Option>
+                <Option value="editPerm">分配权限</Option>
+                <Option value="setDefault">设为默认</Option>
+              </Select>
+            </FormItem>
+            <div v-if="menuFormAdd.type===0">
+              <FormItem label="英文名" prop="name">
+                <Input v-model="menuFormAdd.name"/>
+              </FormItem>
+              <FormItem label="图标" prop="icon"  style="margin-bottom: 5px;">
+                <Input v-model="menuFormAdd.icon"/>
+                <span>
+                  图标请参考 <a target="_blank" href="http://ionicons.com/"><Icon type="ionic"></Icon> ionicons</a>
+                </span>
+              </FormItem>
+              <FormItem label="前端组件" prop="component">
+                <Input v-model="menuFormAdd.component"/>
+              </FormItem>
+            </div>
+            <FormItem label="排序值" prop="sortOrder">
+              <InputNumber :max="1000" :min="0" v-model="menuFormAdd.sortOrder"></InputNumber>
+              <span style="margin-left:5px">值越小越靠前，支持小数</span>
+            </FormItem>
+            <FormItem label="是否启用" prop="status">
+              <i-switch size="large" v-model="addStatus" @on-change="changeAddSwitch">
+                <span slot="open">启用</span>
+                <span slot="close">禁用</span>
+              </i-switch>
+            </FormItem>
+          </Form>
+          <div slot="footer">
+            <Button type="text" @click="cancelAdd">取消</Button>
+            <Button type="primary" :loading="submitLoading" @click="submitAdd">提交</Button>
+          </div>
+        </Modal>
     </div>
 </template>
 
 <script>
 export default {
-  name: "wechat-menu-manage",
+  name: "role-manage",
   data() {
     return {
       loading: true,
+      expandAll: false,
+      modalType: 0,
+      menuModalVisible: false,
       selectList: [],
       selectCount: 0,
-      searchKey: "",
-      sortColumn: "createTime",
-      sortType: "desc",
-      columns: [
-        {
-          type: "selection",
-          width: 60,
-          align: "center"
-        },
-        {
-          title: "操作名称",
-          key: "name",
-          width: 110,
-          sortable: true
-        },
-        {
-          title: "请求类型",
-          key: "requestType",
-          width: 120,
-          align: "center",
-          sortable: true,
-          filters: [
-            {
-              label: "GET",
-              value: "GET"
-            },
-            {
-              label: "POST",
-              value: "POST"
-            },
-            {
-              label: "PUT",
-              value: "PUT"
-            },
-            {
-              label: "DELETE",
-              value: "DELETE"
-            }
-          ],
-          filterMultiple: false,
-          filterMethod(value, row) {
-            if (value === "GET") {
-              return row.requestType === "GET";
-            } else if (value === "POST") {
-              return row.requestType === "POST";
-            } else if (value === "PUT") {
-              return row.requestType === "PUT";
-            } else if (value === "DELETE") {
-              return row.requestType === "DELETE";
-            }
-          }
-        },
-        {
-          title: "请求路径",
-          width: 150,
-          key: "requestUrl"
-        },
-        {
-          title: "请求参数",
-          width: 200,
-          key: "requestParam"
-        },
-        {
-          title: "登录用户",
-          key: "username",
-          width: 105,
-          sortable: true
-        },
-        {
-          title: "IP",
-          key: "ip",
-          width: 100,
-          sortable: true
-        },
-        {
-          title: "IP信息",
-          key: "ipInfo",
-          width: 90,
-          sortable: true
-        },
-        {
-          title: "耗时(毫秒)",
-          key: "costTime",
-          width: 125,
-          sortable: true,
-          align: "center",
-          filters: [
-            {
-              label: "≤1000毫秒",
-              value: 0
-            },
-            {
-              label: ">1000毫秒",
-              value: 1
-            }
-          ],
-          filterMultiple: false,
-          filterMethod(value, row) {
-            if (value === 0) {
-              return row.costTime <= 1000;
-            } else if (value === 1) {
-              return row.costTime > 1000;
-            }
-          }
-        },
-        {
-          title: "创建时间",
-          key: "createTime",
-          sortable: true,
-          width: 105,
-          sortType: "desc"
-        },
-        {
-          title: "操作",
-          key: "action",
-          width: 98,
-          align: "center",
-          render: (h, params) => {
-            return h("div", [
-              h(
-                "Button",
-                {
-                  props: {
-                    type: "error",
-                    size: "small"
-                  },
-                  on: {
-                    click: () => {
-                      this.remove(params.row);
-                    }
-                  }
-                },
-                "删除"
-              )
-            ]);
-          }
-        }
-      ],
-      data: [],
-      pageNumber: 1,
-      pageSize: 10,
-      total: 0
+      showParent: false,
+      isButtonAdd: false,
+      isMenuAdd: false,
+      isMenu: false,
+      editStatus: true,
+      addStatus: true,
+      modalTitle: "",
+      menuForm: {
+        id: "",
+        parentId: "",
+        buttonType: "",
+        type: 0,
+        sortOrder: null,
+        level: null,
+        status: 0
+      },
+      menuFormAdd: {},
+      menuFormValidate: {
+        title: [{ required: true, message: "名称不能为空", trigger: "blur" }],
+        name: [{ required: true, message: "英文名不能为空", trigger: "blur" }],
+        icon: [{ required: true, message: "图标不能为空", trigger: "blur" }],
+        path: [{ required: true, message: "路径不能为空", trigger: "blur" }],
+        component: [
+          { required: true, message: "前端组件不能为空", trigger: "blur" }
+        ]
+      },
+      submitLoading: false,
+      data: []
     };
   },
   methods: {
     init() {
-      this.getLogList();
+      // this.getAllList();
+      this.loadData()
     },
-    changePage(v) {
-      this.pageNumber = v;
-      this.getLogList();
-    },
-    changePageSize(v) {
-      this.pageSize = v;
-      this.getLogList();
-    },
-    getLogList() {
-      this.loading = true;
-      let params = "";
-      let url = "";
-      if (this.searchKey === "") {
-        url = "/log/getAllByPage";
-        params = {
-          pageNumber: this.pageNumber,
-          pageSize: this.pageSize,
-          sort: this.sortColumn,
-          order: this.sortType
-        };
-      } else {
-        url = "/log/search";
-        params = {
-          key: this.searchKey,
-          pageNumber: this.pageNumber,
-          pageSize: this.pageSize,
-          sort: this.sortColumn,
-          order: this.sortType
-        };
+    handleDropdown(name) {
+      if (name === "expandTwo") {
+        this.expandAll = false;
+        this.getAllList();
+      } else if (name === "expandAll") {
+        this.expandAll = true;
+        this.getAllList();
+      } else if (name === "refresh") {
+        this.getAllList();
       }
-      this.getRequest(url, params).then(res => {
+    },
+    getAllList() {
+      this.loading = true;
+      this.getRequest("/permission/getAllList").then(res => {
         this.loading = false;
         if (res.success === true) {
-          this.data = res.result.content;
-          this.total = res.result.totalElements;
+          // 仅展开2级
+          if (!this.expandAll) {
+            res.result.forEach(function(e) {
+
+              if (e.children && e.children.length > 0) {
+                e.children.forEach(function(c) {
+                  if (c.level === 2) {
+                    c.expand = false;
+                  }
+                });
+              }
+            });
+          }
+          this.data = res.result;
         }
       });
     },
-    handleReset() {
-      this.searchKey = "";
-      this.getLogList();
+    loadData(){
+      this.getRequest("/wechat/menu/get").then(res => {
+        this.loading = false;
+      if (res) {
+        // 仅展开2级
+        if (!this.expandAll) {
+          res.menu.buttons.forEach(function(e) {
+            e.title=e.name
+            e.expand=true
+            if (e.subButtons && e.subButtons.length > 0) {
+              e.subButtons.forEach(function(c) {
+                c.title=c.name
+                c.expand = true;
+              });
+            }
+          });
+        }
+        this.data = res.menu.buttons;
+      }
+    })},
+    selectTree(v) {
+      if (v.length > 0) {
+        if (Number(v[0].level) === 1 || Number(v[0].level) === 2) {
+          this.isMenu = true;
+        } else {
+          this.isMenu = false;
+        }
+        if (Number(v[0].status) === 0) {
+          this.editStatus = true;
+        } else {
+          this.editStatus = false;
+        }
+        // 转换null为""
+        for (let attr in v[0]) {
+          if (v[0][attr] === null) {
+            v[0][attr] = "";
+          }
+        }
+        let str = JSON.stringify(v[0]);
+        let menu = JSON.parse(str);
+        if (menu.access === "") {
+          menu.access = null;
+        }
+        this.menuForm = menu;
+      }
     },
-    remove(v) {
-      this.$Modal.confirm({
-        title: "确认删除",
-        content: "您确认要删除该条数据?",
-        onOk: () => {
-          this.deleteRequest("/log/delByIds", { ids: v.id }).then(res => {
+    cancelAdd() {
+      this.menuModalVisible = false;
+    },
+    handleReset() {
+      this.$refs.menuForm.resetFields();
+    },
+    changeEditSwitch(v) {
+      if (v) {
+        this.menuForm.status = 0;
+      } else {
+        this.menuForm.status = 1;
+      }
+    },
+    submitEdit() {
+      this.$refs.menuForm.validate(valid => {
+        if (valid) {
+          if (!this.menuForm.id) {
+            this.$Message.warning("请先点击选择要修改的菜单节点");
+            return;
+          }
+          this.submitLoading = true;
+          if (this.menuForm.sortOrder === null) {
+            this.menuForm.sortOrder = "";
+          }
+          if (this.menuForm.buttonType === null) {
+            this.menuForm.buttonType = "";
+          }
+          if (this.menuForm.type == 1) {
+            this.menuForm.name = "";
+            this.menuForm.icon = "";
+            this.menuForm.component = "";
+          }
+          this.postRequest("/permission/edit", this.menuForm).then(res => {
+            this.submitLoading = false;
             if (res.success === true) {
-              this.$Message.success("删除成功");
+              this.$Message.success("编辑成功");
               this.init();
+              this.menuModalVisible = false;
             }
           });
         }
       });
     },
-    clearSelectAll() {
-      this.$refs.table.selectAll(false);
-    },
-    changeSelect(e) {
-      this.selectList = e;
-      this.selectCount = e.length;
-    },
-    changeSort(e) {
-      this.sortColumn = e.key;
-      this.sortType = e.order;
-      if (e.order === "normal") {
-        this.sortType = "";
+    changeAddSwitch(v) {
+      if (v) {
+        this.menuFormAdd.status = 0;
+      } else {
+        this.menuFormAdd.status = 1;
       }
-      this.getLogList();
+    },
+    submitAdd() {
+      this.$refs.menuFormAdd.validate(valid => {
+        if (valid) {
+          this.submitLoading = true;
+          if (this.menuFormAdd.sortOrder === null) {
+            this.menuFormAdd.sortOrder = "";
+          }
+          if (this.menuFormAdd.buttonType === null) {
+            this.menuFormAdd.buttonType = "";
+          }
+          if (this.menuFormAdd.type == 1) {
+            this.menuForm.name = "";
+            this.menuForm.icon = "";
+            this.menuForm.component = "";
+          }
+          this.postRequest("/permission/add", this.menuFormAdd).then(res => {
+            this.submitLoading = false;
+            if (res.success === true) {
+              this.$Message.success("添加成功");
+              this.init();
+              this.menuModalVisible = false;
+            }
+          });
+        }
+      });
+    },
+    addMenu() {
+      if (this.menuForm.id == "" || this.menuForm.id == null) {
+        this.$Message.warning("请先点击选择一个菜单权限节点");
+        return;
+      }
+      this.modalTitle = "添加菜单权限";
+      this.showParent = true;
+      let type = 0;
+      if (this.menuForm.level === 1) {
+        type = 0;
+        this.isMenuAdd = true;
+        this.isButtonAdd = false;
+      } else if (this.menuForm.level === 2) {
+        type = 1;
+        this.isMenuAdd = false;
+        this.isButtonAdd = true;
+      } else {
+        type = 0;
+        this.isMenuAdd = false;
+        this.isButtonAdd = false;
+      }
+      this.menuFormAdd = {
+        type: type,
+        parentId: this.menuForm.id,
+        level: Number(this.menuForm.level) + 1,
+        sortOrder: 1,
+        buttonType: "",
+        status: 0
+      };
+      this.menuModalVisible = true;
+    },
+    addRootMenu() {
+      this.modalTitle = "添加一级菜单";
+      this.isMenuAdd = true;
+      this.isButtonAdd = false;
+      this.showParent = false;
+      this.menuFormAdd = {
+        type: 0,
+        level: 1,
+        sortOrder: 1,
+        status: 0
+      };
+      this.menuModalVisible = true;
+    },
+    changeSelect(v) {
+      this.selectCount = v.length;
+      this.selectList = v;
     },
     delAll() {
       if (this.selectCount <= 0) {
-        this.$Message.warning("您还未选择要删除的数据");
+        this.$Message.warning("您还未勾选要删除的数据");
         return;
       }
       this.$Modal.confirm({
@@ -279,28 +427,7 @@ export default {
             ids += e.id + ",";
           });
           ids = ids.substring(0, ids.length - 1);
-          this.deleteRequest("/log/delByIds", { ids: ids }).then(res => {
-            if (res.success === true) {
-              this.$Message.success("删除成功");
-              this.init();
-            }
-          });
-        }
-      });
-    },
-    clearAll() {
-      this.$Modal.confirm({
-        title: "确认删除",
-        content: "您确认要彻底清空删除所有条数据?",
-        onOk: () => {
-          this.loading = true;
-          let ids = "";
-          this.selectList.forEach(function(e) {
-            ids += e.id + ",";
-          });
-          ids = ids.substring(0, ids.length - 1);
-          this.deleteRequest("/log/delAll").then(res => {
-            this.loading = false;
+          this.deleteRequest("/permission/delByIds", { ids: ids }).then(res => {
             if (res.success === true) {
               this.$Message.success("删除成功");
               this.init();
