@@ -12,7 +12,7 @@ module.exports = {
     assetsPublicPath: '/',
     proxyTable: {
       '/xboot/*': {
-        target: 'http://127.0.0.1:8888'  // 请求本地 需要xboot后台项目
+        target: 'http://117.48.202.245:8888'  // 请求本地 需要xboot后台项目
       }
     },
 
@@ -24,7 +24,7 @@ module.exports = {
     notifyOnErrors: true,
     poll: false, // https://webpack.js.org/configuration/dev-server/#devserver-watchoptions-
 
-    
+
     /**
      * Source Maps
      */
