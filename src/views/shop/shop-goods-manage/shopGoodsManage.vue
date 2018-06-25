@@ -153,7 +153,7 @@ export default {
         },
         {
           title: "创建时间",
-          key: "createTime",
+          key: "addTime",
           sortable: true,
           width: 105,
           sortType: "desc"
@@ -192,7 +192,7 @@ export default {
   },
   methods: {
     init() {
-      this.getLogList();
+      this.loadData();
     },
     changePage(v) {
       this.pageNumber = v;
@@ -202,33 +202,19 @@ export default {
       this.pageSize = v;
       this.getLogList();
     },
-    getLogList() {
+    loadData() {
       this.loading = true;
-      let params = "";
-      let url = "";
-      if (this.searchKey === "") {
-        url = "/log/getAllByPage";
-        params = {
-          pageNumber: this.pageNumber,
-          pageSize: this.pageSize,
-          sort: this.sortColumn,
-          order: this.sortType
-        };
-      } else {
-        url = "/log/search";
-        params = {
-          key: this.searchKey,
-          pageNumber: this.pageNumber,
-          pageSize: this.pageSize,
-          sort: this.sortColumn,
-          order: this.sortType
-        };
-      }
-      this.getRequest(url, params).then(res => {
+      let params = {
+        current: this.pageNumber,
+        size: this.pageSize,
+        asc: false,
+        descs:"addTime"
+      };
+      this.getRequest("/goods", params).then(res => {
         this.loading = false;
-        if (res.success === true) {
-          this.data = res.result.content;
-          this.total = res.result.totalElements;
+        if (res.status === 200) {
+          this.data = res.data.records;
+          this.total = res.data.total;
         }
       });
     },

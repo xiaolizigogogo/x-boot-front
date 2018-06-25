@@ -218,9 +218,8 @@ export default {
   },
   methods: {
     init() {
-      this.getRoleList();
+      this.loadData();
       // 获取所有菜单权限树
-      this.getPermList();
     },
     changePage(v) {
       this.pageNumber = v;
@@ -238,28 +237,19 @@ export default {
       }
       this.getRoleList();
     },
-    getRoleList() {
+    loadData() {
       this.loading = true;
       let params = {
-        pageNumber: this.pageNumber,
-        pageSize: this.pageSize,
-        sort: "createTime"
+        current: this.pageNumber,
+        size: this.pageSize,
+        asc: false,
+        descs:"gmtCreate"
       };
-      this.getRequest("/role/getAllByPage", params).then(res => {
+      this.getRequest("/productTypes", params).then(res => {
         this.loading = false;
-        if (res.success === true) {
-          this.data = res.result.content;
-          this.total = res.result.totalElements;
-        }
-      });
-    },
-    getPermList() {
-      this.treeLoading = true;
-      this.getRequest("/permission/getAllList").then(res => {
-        this.treeLoading = false;
-        if (res.success === true) {
-          this.deleteDisableNode(res.result);
-          this.permData = res.result;
+        if (res.status === 200) {
+          this.data = res.data.records;
+          this.total = res.data.total;
         }
       });
     },

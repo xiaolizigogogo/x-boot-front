@@ -1,5 +1,5 @@
 <style lang="less">
-@import "shopSubscribeManage.less";
+@import "shopAdvertisementManage.less";
 </style>
 <template>
     <div class="search">
@@ -52,7 +52,7 @@
 <script>
 import {formatDate} from '../../../utils/global'
 export default {
-  name: "shop-subscribe-manage",
+  name: "shop-advertisement-manage",
   data() {
     return {
       loading: true,
@@ -76,76 +76,59 @@ export default {
       columns: [
         {
           type: "selection",
-          width: 55,
+          width: 60,
           align: "center"
         },
         {
-          title: "编号",
-          key: "subscribeId",
+          title: "订单编号",
+          key: "orderSn",
           sortable: true
         },
         {
           title: "创建时间",
-          key: "gmtCreate",
+          key: "addTime",
           sortable: true,
           sortType: "desc",
           render:(h,params)=>{
             return h('div',
-              formatDate(new Date(params.row.gmtCreate)));/*这里的this.row能够获取当前行的数据*/
+              formatDate(new Date(params.row.addTime*1000)));/*这里的this.row能够获取当前行的数据*/
           }
         },
         {
           title: "确认时间",
-          key: "gmtConfirm",
+          key: "confirmTime",
           sortable: true,
           render:(h,params)=>{
             return h('div',
-              formatDate(new Date(params.row.gmtConfirm)));/*这里的this.row能够获取当前行的数据*/
+              params.row.confirmTime?
+              formatDate(new Date(params.row.confirmTime*1000)):"-");/*这里的this.row能够获取当前行的数据*/
           }
         },
         {
-          title: "客户",
-          key: "userId",
+          title: "支付状态",
+          key: "payStatus",
           align: "center",
         },
         {
-          title: "客户手机",
-          key: "phoneNumber",
+          title: "订单状态",
+          key: "orderStatus",
           align: "center",
         },
         {
-          title: "预约时间",
-          key: "subscribeDay",
-          align: "center",
-          render:(h,params)=>{
-            return h('div',params.row.subscribeDay+" "+params.row.subscribeTime)
-          }
-        },
-        {
-          title: "项目",
-          key: "productName",
+          title: "快递状态",
+          key: "shippingStatus",
           align: "center",
         },
         {
-          title: "员工",
-          key: "adminId",
-          align: "center",
-        },
-        {
-          title: "预约状态",
-          key: "subscribeStatus",
-          align: "center",
-        },
-        {
-          title: "结束状态",
-          key: "finishStatus",
+          title: "订单金额",
+          key: "orderPrice",
           align: "center",
         },
         {
           title: "操作",
           key: "action",
           align: "center",
-          width: 200,
+          width: 300,
           render: (h, params) => {
             return h("div", [
               h(
@@ -178,7 +161,10 @@ export default {
                   },
                   on: {
                     click: () => {
-                      this.edit(params.row);
+                      this.$router.push({
+                        name: "shop-advertisement-detail-manage",
+                        query: {id:params.row.id}
+                      });
                     }
                   }
                 },
@@ -239,9 +225,10 @@ export default {
         current: this.pageNumber,
         size: this.pageSize,
         asc: false,
-        descs:"gmtCreate"
+        descs:"id"
       };
-      this.getRequest("/subscribes", params).then(res => {
+      this.getRequest("/adPositions", params).then(res => {
+        console.log(res)
         this.loading = false;
         if (res.status === 200) {
           this.data = res.data.records;

@@ -423,7 +423,7 @@ export default {
   },
   methods: {
     init() {
-      this.getUserList();
+      this.loadData();
     },
     changePage(v) {
       this.searchForm.pageNumber = v;
@@ -439,14 +439,19 @@ export default {
         this.searchForm.endDate = v[1];
       }
     },
-    getUserList() {
-      // 多条件搜索用户列表
+    loadData() {
       this.loading = true;
-      this.getRequest("/user/getByCondition", this.searchForm).then(res => {
+      let params = {
+        current: this.pageNumber,
+        size: this.pageSize,
+        asc: true,
+        descs:"sortOrder"
+      };
+      this.getRequest("/categorys", params).then(res => {
         this.loading = false;
-        if (res.success === true) {
-          this.data = res.result.content;
-          this.total = res.result.totalElements;
+        if (res.status === 200) {
+          this.data = res.data.records;
+          this.total = res.data.total;
         }
       });
     },

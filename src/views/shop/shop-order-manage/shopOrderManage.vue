@@ -50,6 +50,7 @@
 </template>
 
 <script>
+import {formatDate} from '../../../utils/global'
 export default {
   name: "shop-order-manage",
   data() {
@@ -79,70 +80,49 @@ export default {
           align: "center"
         },
         {
-          title: "角色名称",
-          key: "name",
+          title: "订单编号",
+          key: "orderSn",
           sortable: true
         },
         {
           title: "创建时间",
-          key: "createTime",
+          key: "addTime",
           sortable: true,
-          sortType: "desc"
-        },
-        {
-          title: "更新时间",
-          key: "updateTime",
-          sortable: true
-        },
-        {
-          title: "是否设置为注册用户默认角色",
-          key: "defaultRole",
-          align: "center",
-          render: (h, params) => {
-            if (params.row.defaultRole) {
-              return h("div", [
-                h(
-                  "Button",
-                  {
-                    props: {
-                      type: "success",
-                      size: "small"
-                    },
-                    style: {
-                      marginRight: "5px"
-                    },
-                    on: {
-                      click: () => {
-                        this.cancelDefault(params.row);
-                      }
-                    }
-                  },
-                  "取消默认"
-                )
-              ]);
-            } else {
-              return h("div", [
-                h(
-                  "Button",
-                  {
-                    props: {
-                      type: "info",
-                      size: "small"
-                    },
-                    style: {
-                      marginRight: "5px"
-                    },
-                    on: {
-                      click: () => {
-                        this.setDefault(params.row);
-                      }
-                    }
-                  },
-                  "设为默认"
-                )
-              ]);
-            }
+          sortType: "desc",
+          render:(h,params)=>{
+            return h('div',
+              formatDate(new Date(params.row.addTime*1000)));/*这里的this.row能够获取当前行的数据*/
           }
+        },
+        {
+          title: "确认时间",
+          key: "confirmTime",
+          sortable: true,
+          render:(h,params)=>{
+            return h('div',
+              params.row.confirmTime?
+              formatDate(new Date(params.row.confirmTime*1000)):"-");/*这里的this.row能够获取当前行的数据*/
+          }
+        },
+        {
+          title: "支付状态",
+          key: "payStatus",
+          align: "center",
+        },
+        {
+          title: "订单状态",
+          key: "orderStatus",
+          align: "center",
+        },
+        {
+          title: "快递状态",
+          key: "shippingStatus",
+          align: "center",
+        },
+        {
+          title: "订单金额",
+          key: "orderPrice",
+          align: "center",
         },
         {
           title: "操作",
@@ -218,9 +198,7 @@ export default {
   },
   methods: {
     init() {
-      this.getRoleList();
-      // 获取所有菜单权限树
-      this.getPermList();
+      this.loadData();
     },
     changePage(v) {
       this.pageNumber = v;
@@ -238,28 +216,20 @@ export default {
       }
       this.getRoleList();
     },
-    getRoleList() {
+    loadData() {
       this.loading = true;
       let params = {
-        pageNumber: this.pageNumber,
-        pageSize: this.pageSize,
-        sort: "createTime"
+        current: this.pageNumber,
+        size: this.pageSize,
+        asc: false,
+        descs:"addTime"
       };
-      this.getRequest("/role/getAllByPage", params).then(res => {
+      this.getRequest("/orders", params).then(res => {
+        console.log(res)
         this.loading = false;
-        if (res.success === true) {
-          this.data = res.result.content;
-          this.total = res.result.totalElements;
-        }
-      });
-    },
-    getPermList() {
-      this.treeLoading = true;
-      this.getRequest("/permission/getAllList").then(res => {
-        this.treeLoading = false;
-        if (res.success === true) {
-          this.deleteDisableNode(res.result);
-          this.permData = res.result;
+        if (res.status === 200) {
+          this.data = res.data.records;
+          this.total = res.data.total;
         }
       });
     },
