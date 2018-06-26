@@ -110,6 +110,9 @@
                       <Option v-for="item in roleList" :value="item.id" :key="item.id">{{ item.name }}</Option>
                   </Select>
                 </FormItem>
+              <qiniu
+                @handleSuccess = "(url) => this.formItem.litpic = url">
+              </qiniu>
             </Form>
             <div slot="footer">
                 <Button type="text" @click="cancelUser">取消</Button>
@@ -120,6 +123,7 @@
 </template>
 
 <script>
+  import qiniu from '../../my-components/image-upload/qiniu'
 export default {
   name: "shop-category-manage",
   data() {
@@ -348,6 +352,9 @@ export default {
       total: 0
     };
   },
+  components:{
+    qiniu
+  },
   methods: {
     init() {
       this.loadData();
@@ -478,9 +485,6 @@ export default {
       let userInfo = JSON.parse(str);
       this.userForm = userInfo;
       let selectRolesId = [];
-      this.userForm.roles.forEach(function(e) {
-        selectRolesId.push(e.id);
-      });
       this.userForm.roles = selectRolesId;
       this.userModalVisible = true;
     },

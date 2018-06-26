@@ -10,10 +10,10 @@
                 个人信息
             </p>
             <div>
-                <Form 
+                <Form
                     ref="userForm"
-                    :model="userForm" 
-                    :label-width="100" 
+                    :model="userForm"
+                    :label-width="100"
                     label-position="right"
                 >
                     <FormItem label="用户头像：">
@@ -54,7 +54,7 @@
                     <FormItem label="性别：">
                         <RadioGroup v-model="userForm.sex">
                           <Radio :label="1">男</Radio>
-                          <Radio :label="0">女</Radio>
+                          <RadiZ-o :label="0">女</RadiZ-o>
                         </RadioGroup>
                     </FormItem>
                     <FormItem label="手机号：">

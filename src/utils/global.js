@@ -65,10 +65,19 @@ function deepClone(obj1,obj2){
   return obj2; //然后在把复制好的对象给return出去
 }
 
+const qiniuConfig={
+  pic_hostname:'1',
+  action_url:'2',
+  access_key:'3',
+  secret_key:'4',
+  bucketname:'5',
+}
+
 export
 {
   formatDate,
   formatNativeDate,
   fmoney,
   deepClone,
+  qiniuConfig
 }
