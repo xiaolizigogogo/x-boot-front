@@ -49,7 +49,7 @@ axios.interceptors.response.use(response => {
     }
 
     return data;
-}, (err) => { 
+}, (err) => {
     // 返回状态码不为200时候的错误处理
     Message.error(err.toString());
     return Promise.resolve(err);
@@ -86,7 +86,18 @@ export const postRequest = (url, params) => {
         }
     });
 };
-
+export const postBodyRequest = (url, params) => {
+  let accessToken = getStore("accessToken");
+  return axios({
+    method: 'post',
+    url: `${base}${url}`,
+    data: params,
+    headers: {
+      'Content-Type': 'application/json',
+      'accessToken': accessToken
+    }
+  });
+};
 export const putRequest = (url, params) => {
     let accessToken = getStore("accessToken");
     return axios({

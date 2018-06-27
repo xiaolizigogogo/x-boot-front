@@ -32,7 +32,7 @@
       </div>
     </Upload>
     <Modal title="图片预览" v-model="visible">
-      <img :src="picHostName + imgName" v-if="visible" style="width: 100%">
+      <img :src="imgName" v-if="visible" style="width: 100%">
     </Modal>
   </div>
 </template>
@@ -56,18 +56,19 @@
       },
       height:{
         default:'58px'
-      }
+      },
+      imgList:''
     },
     data() {
       return {
-        defaultList: [],
         imgName: "",
         picHostName:qiniuConfig.pic_hostname,
         visible: false,
-        uploadList: [],
         uptoken:{},
         actionUrl:qiniuConfig.action_url,
-        fileList:[]
+        defaultList: [],
+        fileList:[],
+        uploadList:[],
       };
     },
     methods: {
@@ -83,10 +84,10 @@
         this.$refs.upload.fileList.splice(fileList.indexOf(file), 1);
       },
       handleSuccess(res, file) {
-        // console.log(res);
-        file.url = qiniuConfig.pic_hostname+res.key;
-        file.name = res.key;
-        this.$emit('handleSuccess',qiniuConfig.pic_hostname+res.key);//传递给父组件
+         console.log(res);
+        file.url = res.result;
+        file.name = res.result;
+        this.$emit('handleSuccess', res.result);//传递给父组件
       },
       handleFormatError(file) {
         this.$Notice.warning({
@@ -116,6 +117,7 @@
     mounted() {
       this.getToken();
       this.uploadList = this.$refs.upload.fileList;
+      console.log(this.imgList);
     }
   };
 </script>

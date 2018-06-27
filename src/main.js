@@ -13,7 +13,7 @@ import Icon from 'vue-awesome/components/Icon';
 import 'vue-awesome/icons/brands/qq';
 import 'vue-awesome/icons/brands/weixin';
 import 'vue-awesome/icons/brands/weibo';
-import { getRequest, postRequest, putRequest, deleteRequest, uploadFileRequest } from '@/utils/api';
+import { getRequest, postRequest, putRequest, deleteRequest, uploadFileRequest,postBodyRequest } from '@/utils/api';
 import util from '@/libs/util';
 import hasButton from '@/libs/hasButton';
 
@@ -28,6 +28,7 @@ Vue.prototype.postRequest = postRequest;
 Vue.prototype.putRequest = putRequest;
 Vue.prototype.deleteRequest = deleteRequest;
 Vue.prototype.uploadFileRequest = uploadFileRequest;
+Vue.prototype.postBodyRequest = postBodyRequest;
 
 /* eslint-disable no-new */
 new Vue({

@@ -111,7 +111,7 @@
                   </Select>
                 </FormItem>
               <qiniu
-                @handleSuccess = "(url) => this.formItem.litpic = url">
+                @handleSuccess = "(url) => this.userForm.litpic = url" :imgList="this.userForm.img">
               </qiniu>
             </Form>
             <div slot="footer">
@@ -168,7 +168,8 @@ export default {
       modalTitle: "",
       userForm: {
         sex: 1,
-        roles: []
+        roles: [],
+        img:['1','2']
       },
       userRoles: [],
       roleList: [],
@@ -227,7 +228,27 @@ export default {
           title: "图片链接",
           key: "wapBannerUrl",
           width: 200,
-          sortable: true
+          sortable: true,
+          render: (h, params) => {
+            return h('div', {
+              attrs: {
+                style: 'width: 80px;height: 80px;'
+              },
+            }, [
+              h('img', {
+                props: {
+                  type: 'primary',
+                  size: 'small'
+                },
+                attrs: {
+                  src: params.row.wapBannerUrl, style: 'width: 80px;height: 80px;border-radius: 2px;'
+                },
+                style: {
+                },
+              }),
+            ]);
+          }
+
         },
         {
           title: "操作",
@@ -485,6 +506,7 @@ export default {
       let userInfo = JSON.parse(str);
       this.userForm = userInfo;
       let selectRolesId = [];
+      this.userForm.img=[v.wapBannerUrl];
       this.userForm.roles = selectRolesId;
       this.userModalVisible = true;
     },

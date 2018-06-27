@@ -1,5 +1,5 @@
 <style lang="less">
-@import "shopMemberManage.less";
+@import "shopTradeManage.less";
 </style>
 <template>
     <div class="search">
@@ -86,81 +86,57 @@ export default {
         },
         {
           title: "用户名",
-          key: "nickname",
+          key: "memberName",
           sortable: true
         },
         {
-          title: "性别",
-          key: "gender",
+          title: "交易类别",
+          key: "tradeType",
           sortable: true,
           sortType: "desc",
           render: (h, params) => {
             let re = "";
-            if (params.row.gender === 1) {
-              re = "男";
-            } else if (params.row.gender === 0) {
-              re = "女";
+            if (params.row.tradeType === 'PURCHASE') {
+              re = "消费";
+            } else if (params.row.tradeType === 'CHARGE') {
+              re = "充值";
             }
             return h("div", re);
           }
         },
         {
           title: "手机号",
-          key: "mobile",
+          key: "memberPhoneNumber",
           sortable: true,
           sortType: "desc",
         },
         {
-          title: "累计消费",
-          key: "purchaseMoney",
+          title: "交易金额",
+          key: "tradeMoney",
           sortable: true,
           render:(h,params)=>{
             return h('div',
-              fmoney(params.row.purchaseMoney,2));/*这里的this.row能够获取当前行的数据*/
+              fmoney(params.row.tradeMoney,2));/*这里的this.row能够获取当前行的数据*/
           }
         },
         {
-          title: "累计充值",
-          key: "rechargeMoney",
+          title: "交易余额",
+          key: "tradeAfterMoney",
           sortable: true,
           render:(h,params)=>{
             return h('div',
-              fmoney(params.row.rechargeMoney,2));/*这里的this.row能够获取当前行的数据*/
+              fmoney(params.row.tradeAfterMoney,2));/*这里的this.row能够获取当前行的数据*/
           }
         },
         {
-          title: "关注状态",
-          key: "subscribe",
-          sortable: true,
-          render: (h, params) => {
-            let re = "";
-            if (params.row.subscribe === 1) {
-              re = "已关注";
-            } else if (params.row.subscribe === 0) {
-              re = "未关注";
-            }
-            return h("div", re);
-          }
-        },
-        {
-          title: "注册时间",
+          title: "交易时间",
           key: "registerTime",
           sortable: true,
           render:(h,params)=>{
             return h('div',
-              params.row.registerTime?
-                formatDate(new Date(params.row.registerTime*1000)):"-");/*这里的this.row能够获取当前行的数据*/
+              params.row.gmtCreate?
+                formatDate(new Date(params.row.gmtCreate)):"-");/*这里的this.row能够获取当前行的数据*/
           }},
-        {
-          title: "最后登录时间",
-          key: "lastLoginTime",
-          sortable: true,
-          render:(h,params)=>{
-            return h('div',
-              params.row.lastLoginTime?
-                formatDate(new Date(params.row.lastLoginTime*1000)):"-");/*这里的this.row能够获取当前行的数据*/
-          }
-        },
         {
           title: "操作",
           key: "action",
@@ -303,14 +279,14 @@ export default {
         current: this.pageNumber,
         size: this.pageSize,
         asc: false,
-        descs:"registerTime"
+        descs:"gmtCreate"
       };
-      this.getRequest("/members", params).then(res => {
+      this.getRequest("/trades", params).then(res => {
         console.log(res)
         this.loading = false;
         if (res.status === 200) {
-          this.data = res.data.records;
-          this.total = res.data.total;
+          this.data = res.data.trades.records;
+          this.total = res.data.trades.total;
         }
       });
     },

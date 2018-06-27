@@ -66,11 +66,11 @@ function deepClone(obj1,obj2){
 }
 
 const qiniuConfig={
-  pic_hostname:'1',
-  action_url:'2',
-  access_key:'3',
-  secret_key:'4',
-  bucketname:'5',
+  pic_hostname:'http://payobwhnt.bkt.clouddn.com/',
+  action_url:'/xboot/upload/file',
+  access_key:'i477ZyACjO6tbJKmpA-E2Bdl2TH1GW8jjilw7CNu',
+  secret_key:'787WvgkEQO_uKL9l5fRihJj2VGI-FIf40hRjEnwg',
+  bucketname:'shop',
 }
 
 export

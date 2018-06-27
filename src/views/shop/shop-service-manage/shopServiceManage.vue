@@ -38,7 +38,9 @@
               <Input v-model="serviceForm.memo" placeholder="项目介绍"/>
             </FormItem>
             <FormItem label="项目图片" prop="image">
-              <Input v-model="serviceForm.image" placeholder="项目图片"/>
+              <qiniu
+                @handleSuccess = "(url) => this.serviceForm.img = url">
+              </qiniu>
             </FormItem>
           </Form>
           <div slot="footer">
@@ -59,8 +61,13 @@
 </template>
 
 <script>
+  import qiniu from '../../my-components/image-upload/qiniu'
+  import formatDate from '../../../utils/global'
 export default {
   name: "shop-service-manage",
+  components:{
+    qiniu
+  },
   data() {
     return {
       loading: true,
@@ -76,7 +83,13 @@ export default {
         name: "",
         code: "",
         memo:"",
-        image:""
+        img:"",
+        id:"",
+        enable:true,
+        gmtCreate:"",
+        gmtModify:"",
+        operator:"",
+        orderBy:""
       },
       serviceFormValidate: {
         name: [{ required: true, message: "角色名称不能为空", trigger: "blur" }]
@@ -99,12 +112,22 @@ export default {
           title: "创建时间",
           key: "gmtCreate",
           sortable: true,
-          sortType: "desc"
+          sortType: "desc",
+          render:(h,params)=>{
+            return h('div',
+              params.row.gmtCreate?
+                formatDate(new Date(params.row.gmtCreate)):"-");/*这里的this.row能够获取当前行的数据*/
+          }
         },
         {
           title: "更新时间",
           key: "gmtModify",
-          sortable: true
+          sortable: true,
+          render:(h,params)=>{
+            return h('div',
+              params.row.gmtModify?
+                formatDate(new Date(params.row.gmtModify)):"-");/*这里的this.row能够获取当前行的数据*/
+          }
         },
         {
           title: "是否有效",
@@ -284,18 +307,16 @@ export default {
     submitRole() {
       this.$refs.serviceForm.validate(valid => {
         if (valid) {
-          let url = "/role/save";
-          if (this.modalType === 1) {
-            // 编辑用户
-            url = "/role/edit";
-          }
           this.submitLoading = true;
-          this.postRequest(url, this.serviceForm).then(res => {
+          this.postRequest("/productTypes", this.serviceForm).then(res => {
             this.submitLoading = false;
-            if (res.success === true) {
+            if (res.status === 200) {
               this.$Message.success("操作成功");
               this.init();
               this.roleModalVisible = false;
+            }
+            else{
+              this.$Message.success("操作失败,原因:"+res.error);
             }
           });
         }
@@ -304,24 +325,30 @@ export default {
     addRole() {
       this.modalType = 0;
       this.modalTitle = "添加服务项目";
-      this.serviceForm = {
-        name: "",
-        access: null
-      };
+      this.serviceForm={
+          name: "",
+          code: "",
+          memo:"",
+          img:"",
+          id:"",
+          enable:true,
+          gmtCreate:"",
+          gmtModify:"",
+          operator:"",
+          orderBy:""
+      },
       this.roleModalVisible = true;
     },
     edit(v) {
       this.modalType = 1;
-      this.modalTitle = "编辑角色";
+      this.modalTitle = "编辑服务项目";
       // 转换null为""
       for (let attr in v) {
         if (v[attr] === null) {
           v[attr] = "";
         }
       }
-      let str = JSON.stringify(v);
-      let serviceInfo = JSON.parse(str);
-      this.serviceForm = serviceInfo;
+      this.serviceForm.code=serviceInfo;
       this.roleModalVisible = true;
     },
     remove(v) {
