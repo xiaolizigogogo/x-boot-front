@@ -57,7 +57,9 @@
       height:{
         default:'58px'
       },
-      imgList:''
+      imgUrl:{
+        type:String
+      }
     },
     data() {
       return {
@@ -66,9 +68,11 @@
         visible: false,
         uptoken:{},
         actionUrl:qiniuConfig.action_url,
-        defaultList: [],
         fileList:[],
         uploadList:[],
+        defaultList:[ {
+          url: ""
+        }]
       };
     },
     methods: {
@@ -84,7 +88,9 @@
         this.$refs.upload.fileList.splice(fileList.indexOf(file), 1);
       },
       handleSuccess(res, file) {
-         console.log(res);
+        console.log(this.uploadList);
+        console.log(this.defaultList);
+        console.log(this.fileList);
         file.url = res.result;
         file.name = res.result;
         this.$emit('handleSuccess', res.result);//传递给父组件
@@ -118,6 +124,13 @@
       this.getToken();
       this.uploadList = this.$refs.upload.fileList;
       console.log(this.imgList);
+    },
+    watch:{
+      imgUrl:function(var1,oldVar){
+        console.log(var1);
+        this.defaultList[0].url =var1;
+        this.uploadList = this.$refs.upload.fileList;
+      }
     }
   };
 </script>

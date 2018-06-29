@@ -111,7 +111,7 @@
                   </Select>
                 </FormItem>
               <qiniu
-                @handleSuccess = "(url) => this.userForm.litpic = url" :imgList="this.userForm.img">
+                @handleSuccess = "(url) => this.userForm.litpic = url" :imgUrl="this.userForm.img">
               </qiniu>
             </Form>
             <div slot="footer">
@@ -169,7 +169,7 @@ export default {
       userForm: {
         sex: 1,
         roles: [],
-        img:['1','2']
+        img:''
       },
       userRoles: [],
       roleList: [],
@@ -506,7 +506,7 @@ export default {
       let userInfo = JSON.parse(str);
       this.userForm = userInfo;
       let selectRolesId = [];
-      this.userForm.img=[v.wapBannerUrl];
+      this.userForm.img=v.wapBannerUrl
       this.userForm.roles = selectRolesId;
       this.userModalVisible = true;
     },

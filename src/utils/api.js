@@ -117,7 +117,18 @@ export const putRequest = (url, params) => {
         }
     });
 };
-
+export const putBodyRequest = (url, params) => {
+  let accessToken = getStore("accessToken");
+  return axios({
+    method: 'put',
+    url: `${base}${url}`,
+    data: params,
+    headers: {
+      'Content-Type': 'application/json',
+      'accessToken': accessToken
+    }
+  });
+};
 export const deleteRequest = (url, params) => {
     let accessToken = getStore('accessToken');
     return axios({

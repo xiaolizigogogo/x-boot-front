@@ -39,7 +39,7 @@
             </FormItem>
             <FormItem label="项目图片" prop="image">
               <qiniu
-                @handleSuccess = "(url) => this.serviceForm.img = url">
+                @handleSuccess = "(url) => this.serviceForm.img = url" >
               </qiniu>
             </FormItem>
           </Form>
@@ -62,7 +62,7 @@
 
 <script>
   import qiniu from '../../my-components/image-upload/qiniu'
-  import formatDate from '../../../utils/global'
+  import {formatDate} from '../../../utils/global'
 export default {
   name: "shop-service-manage",
   components:{
@@ -86,8 +86,6 @@ export default {
         img:"",
         id:"",
         enable:true,
-        gmtCreate:"",
-        gmtModify:"",
         operator:"",
         orderBy:""
       },
@@ -134,7 +132,7 @@ export default {
           key: "enable",
           align: "center",
           render: (h, params) => {
-            if (params.row.defaultRole) {
+            if (params.row.enable) {
               return h("div", [
                 h(
                   "Button",
@@ -186,24 +184,6 @@ export default {
           width: 300,
           render: (h, params) => {
             return h("div", [
-              h(
-                "Button",
-                {
-                  props: {
-                    type: "warning",
-                    size: "small"
-                  },
-                  style: {
-                    marginRight: "5px"
-                  },
-                  on: {
-                    click: () => {
-                      this.editPerm(params.row);
-                    }
-                  }
-                },
-                "分配权限"
-              ),
               h(
                 "Button",
                 {
@@ -308,7 +288,7 @@ export default {
       this.$refs.serviceForm.validate(valid => {
         if (valid) {
           this.submitLoading = true;
-          this.postRequest("/productTypes", this.serviceForm).then(res => {
+          this.postBodyRequest("/productTypes", this.serviceForm).then(res => {
             this.submitLoading = false;
             if (res.status === 200) {
               this.$Message.success("操作成功");
@@ -332,8 +312,6 @@ export default {
           img:"",
           id:"",
           enable:true,
-          gmtCreate:"",
-          gmtModify:"",
           operator:"",
           orderBy:""
       },
@@ -348,16 +326,18 @@ export default {
           v[attr] = "";
         }
       }
-      this.serviceForm.code=serviceInfo;
+      let str = JSON.stringify(v);
+      let serviceInfo = JSON.parse(str);
+      this.serviceForm=serviceInfo;
       this.roleModalVisible = true;
     },
     remove(v) {
       this.$Modal.confirm({
         title: "确认删除",
-        content: "您确认要删除角色 " + v.name + " ?",
+        content: "您确认要删除 " + v.name + " ?",
         onOk: () => {
-          this.deleteRequest("/role/delAllByIds", { ids: v.id }).then(res => {
-            if (res.success === true) {
+          this.deleteRequest("/productTypes", { id: v.id }).then(res => {
+            if (res.status === 200) {
               this.$Message.success("删除成功");
               this.init();
             }
@@ -368,14 +348,14 @@ export default {
     setDefault(v) {
       this.$Modal.confirm({
         title: "确认设置",
-        content: "您确认要设置所选的 " + v.name + " 为注册用户默认角色?",
+        content: "您确认要设置所选的 " + v.name + " 有效?",
         onOk: () => {
           let params = {
             id: v.id,
-            isDefault: true
+            enable: true
           };
-          this.postRequest("/role/setDefault", params).then(res => {
-            if (res.success === true) {
+          this.putBodyRequest("/productTypes", params).then(res => {
+            if (res.status === 200) {
               this.$Message.success("操作成功");
               this.init();
             }
@@ -385,15 +365,15 @@ export default {
     },
     cancelDefault(v) {
       this.$Modal.confirm({
-        title: "确认取消",
-        content: "您确认要取消所选的 " + v.name + " 角色为默认?",
+        title: "确认设为无效",
+        content: "您确认要设置所选的 " + v.name + "无效?",
         onOk: () => {
           let params = {
             id: v.id,
-            isDefault: false
+            enable: false
           };
-          this.postRequest("/role/setDefault", params).then(res => {
-            if (res.success === true) {
+          this.putBodyRequest("/productTypes", params).then(res => {
+            if (res.status === 200) {
               this.$Message.success("操作成功");
               this.init();
             }
