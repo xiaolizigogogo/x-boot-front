@@ -8,36 +8,21 @@
                 <Card>
                     <Row>
                         <Form ref="searchForm" :model="searchForm" inline :label-width="70" class="search-form">
-                            <Form-item label="用户名称" prop="username">
-                              <Input type="text" v-model="searchForm.username" clearable placeholder="请输入用户名" style="width: 200px"/>
+                            <Form-item label="编号" prop="id">
+                              <Input type="text" v-model="searchForm.id" clearable placeholder="请输入编号" style="width: 200px"/>
                             </Form-item>
-                            <Form-item label="手机号" prop="mobile">
-                              <Input type="text" v-model="searchForm.mobile" clearable placeholder="请输入手机号" style="width: 200px"/>
+                            <Form-item label="名称" prop="name">
+                              <Input type="text" v-model="searchForm.name" clearable placeholder="请输入名称" style="width: 200px"/>
                             </Form-item>
                             <span v-if="drop">
-                              <Form-item label="邮箱" prop="email">
-                                <Input type="text" v-model="searchForm.email" clearable placeholder="请输入邮箱" style="width: 200px"/>
+                              <Form-item label="父类型" prop="parentId">
+                                <Input type="text" v-model="searchForm.parentId" clearable placeholder="请输入父类型" style="width: 200px"/>
                               </Form-item>
-                              <Form-item label="性别" prop="sex">
-                                <Select v-model="searchForm.sex" placeholder="请选择" clearable style="width: 200px">
-                                  <Option value="0">女</Option>
-                                  <Option value="1">男</Option>
+                              <Form-item label="是否显示" prop="sex">
+                                <Select v-model="searchForm.isShow" placeholder="请选择" clearable style="width: 200px">
+                                  <Option value="0">不显示</Option>
+                                  <Option value="1">显示</Option>
                                 </Select>
-                              </Form-item>
-                              <Form-item label="用户类型" prop="type">
-                                <Select v-model="searchForm.type" placeholder="请选择" clearable style="width: 200px">
-                                  <Option value="0">普通用户</Option>
-                                  <Option value="1">管理员</Option>
-                                </Select>
-                              </Form-item>
-                              <Form-item label="用户状态" prop="status">
-                                <Select v-model="searchForm.status" placeholder="请选择" clearable style="width: 200px">
-                                  <Option value="0">正常</Option>
-                                  <Option value="-1">禁用</Option>
-                                </Select>
-                              </Form-item>
-                              <Form-item label="创建时间" prop="status">
-                                <DatePicker type="daterange" format="yyyy-MM-dd" clearable @on-change="selectDateRange" placeholder="选择起始时间" style="width: 200px"></DatePicker>
                               </Form-item>
                             </span>
                             <Form-item style="margin-left:-35px;">
@@ -50,7 +35,7 @@
                         </Form>
                     </Row>
                     <Row class="operation">
-                        <Button @click="addUser" type="primary" icon="plus-round">添加用户</Button>
+                        <Button @click="addUser" type="primary" icon="plus-round">添加分类</Button>
                         <Button @click="delAll" type="ghost" icon="trash-a">批量删除</Button>
                         <Dropdown @on-click="handleDropdown">
                           <Button type="ghost">
@@ -80,38 +65,40 @@
             </Col>
         </Row>
         <Modal :title="modalTitle" v-model="userModalVisible" :mask-closable='false' :width="500">
-            <Form ref="userForm" :model="userForm" :label-width="70" :rules="userFormValidate">
-                <FormItem label="用户名" prop="username">
-                    <Input v-model="userForm.username"/>
-                </FormItem>
-                <FormItem label="密码" prop="password" v-if="modalType===0" :error="errorPass">
-                    <Input type="password" v-model="userForm.password"/>
-                </FormItem>
-                <FormItem label="邮箱" prop="email">
-                    <Input v-model="userForm.email"/>
-                </FormItem>
-                <FormItem label="手机号" prop="mobile">
-                    <Input v-model="userForm.mobile"/>
-                </FormItem>
-                <FormItem label="性别" prop="sex">
-                  <RadioGroup v-model="userForm.sex">
-                    <Radio :label="1">男</Radio>
-                    <Radio :label="0">女</Radio>
-                  </RadioGroup>
-                </FormItem>
-                <FormItem label="用户类型" prop="type">
-                  <Select v-model="userForm.type" placeholder="请选择">
-                    <Option :value="0">普通用户</Option>
-                    <Option :value="1">管理员</Option>
-                  </Select>
-                </FormItem>
-                <FormItem label="角色分配" prop="roles">
-                  <Select v-model="userForm.roles" multiple @on-change="selectRoles">
-                      <Option v-for="item in roleList" :value="item.id" :key="item.id">{{ item.name }}</Option>
-                  </Select>
-                </FormItem>
+            <Form ref="createForm" :model="createForm" :label-width="70" :rules="userFormValidate">
+              <Form-item label="名称" prop="name">
+                <Input type="text" v-model="createForm.name" clearable placeholder="请输入名称" style="width: 200px"/>
+              </Form-item>
+                              <Form-item label="父类型" prop="parentId">
+                                <Input type="text" v-model="createForm.parentId" clearable placeholder="请输入父类型" style="width: 200px"/>
+                              </Form-item>
+                              <Form-item label="是否显示" prop="sex">
+                                <Select v-model="createForm.isShow" placeholder="请选择" clearable style="width: 200px">
+                                  <Option value="0">不显示</Option>
+                                  <Option value="1">显示</Option>
+                                </Select>
+                              </Form-item>
+              <Form-item label="图标" prop="bannerUrl">
+                <Input type="text" v-model="createForm.bannerUrl" clearable placeholder="请输入图标" style="width: 200px"/>
+              </Form-item>
+              <Form-item label="显示索引" prop="showIndex">
+                <Input type="text" v-model="createForm.showIndex" clearable placeholder="请输入显示索引" style="width: 200px"/>
+              </Form-item>
+              <Form-item label="前台名称" prop="frontName">
+                <Input type="text" v-model="createForm.frontName" clearable placeholder="请输入前台名称" style="width: 200px"/>
+              </Form-item>
+              <Form-item label="前台描述" prop="frontDesc">
+                <Input type="text" v-model="createForm.frontDesc" clearable placeholder="请输入前台描述" style="width: 200px"/>
+              </Form-item>
+              <Form-item label="图片路径" prop="imgUrl">
+                <Input type="text" v-model="createForm.imgUrl" clearable placeholder="请输入图片路径" style="width: 200px"/>
+              </Form-item>
+              <Form-item label="网页图片" prop="wapBannerUrl">
+                <Input type="text" v-model="createForm.wapBannerUrl" clearable placeholder="请输入父类型" style="width: 200px"/>
+              </Form-item>
+
               <qiniu
-                @handleSuccess = "(url) => this.userForm.litpic = url" :imgUrl="this.userForm.img">
+                @handleSuccess = "(url) => this.createForm.litpic = url" :imgUrl="this.createForm.img">
               </qiniu>
             </Form>
             <div slot="footer">
@@ -150,18 +137,29 @@ export default {
       selectCount: 0,
       selectList: [],
       searchForm: {
-        username: "",
-        mobile: "",
-        email: "",
-        sex: "",
-        type: "",
-        status: "",
+        id: "",
+        name: "",
+        parentId: "",
+        isShow: "",
+        sortOrder: "",
+        wapBannerUrl: "",
         pageNumber: 1,
         pageSize: 10,
-        sort: "createTime",
-        order: "desc",
-        startDate: "",
-        endDate: ""
+      },
+      createForm:{
+        name:"",
+        parentId:"",
+        isShow:"",
+        sortOrder:"",
+        wapBannerUrl:"",
+        frontDesc:"",
+        frontName:"",
+        iconUrl:"1",
+        level:"V1",
+        showIndex:"",
+        type:0,
+        imgUrl:"",
+        bannerUrl:""
       },
       modalType: 0,
       userModalVisible: false,
@@ -187,6 +185,8 @@ export default {
           { type: "email", message: "邮箱格式不正确" }
         ]
       },
+      asc: true,
+      descs:"sortOrder",
       submitLoading: false,
       columns: [
         {
@@ -216,7 +216,52 @@ export default {
           title: "是否显示",
           key: "isShow",
           width: 110,
-          sortable: true
+          sortable: true,
+          render: (h, params) => {
+          if (params.row.isShow) {
+          return h("div", [
+            h(
+              "Button",
+          {
+            props: {
+              type: "success",
+              size: "small"
+            },
+            style: {
+              marginRight: "5px"
+            },
+            on: {
+              click: () => {
+              this.cancelDefault(params.row);
+    }
+    }
+    },
+      "设为不显示"
+    )
+    ]);
+    } else {
+      return h("div", [
+        h(
+          "Button",
+          {
+            props: {
+              type: "info",
+              size: "small"
+            },
+            style: {
+              marginRight: "5px"
+            },
+            on: {
+              click: () => {
+              this.setDefault(params.row);
+    }
+    }
+    },
+      "设为显示"
+    )
+    ]);
+    }
+  }
         },
         {
           title: "排序值",
@@ -330,24 +375,7 @@ export default {
                   },
                   "编辑"
                 ),
-                h(
-                  "Button",
-                  {
-                    props: {
-                      type: "success",
-                      size: "small"
-                    },
-                    style: {
-                      marginRight: "5px"
-                    },
-                    on: {
-                      click: () => {
-                        this.enable(params.row);
-                      }
-                    }
-                  },
-                  "启用"
-                ),
+
                 h(
                   "Button",
                   {
@@ -382,11 +410,11 @@ export default {
     },
     changePage(v) {
       this.searchForm.pageNumber = v;
-      this.getUserList();
+      this.init();
     },
     changePageSize(v) {
       this.searchForm.pageSize = v;
-      this.getUserList();
+      this.init();
     },
     selectDateRange(v) {
       if (v) {
@@ -396,13 +424,9 @@ export default {
     },
     loadData() {
       this.loading = true;
-      let params = {
-        current: this.pageNumber,
-        size: this.pageSize,
-        asc: true,
-        descs:"sortOrder"
-      };
-      this.getRequest("/categorys", params).then(res => {
+      this.searchForm.current=this.searchForm.pageNumber
+      this.searchForm.size=this.searchForm.pageSize
+      this.getRequest("/categorys", this.searchForm).then(res => {
         this.loading = false;
         if (res.status === 200) {
           this.data = res.data.records;
@@ -453,7 +477,7 @@ export default {
           }
         });
       } else if (name === "refresh") {
-        this.getUserList();
+        this.init();
       }
     },
     selectRoles(v) {},
@@ -461,23 +485,12 @@ export default {
       this.userModalVisible = false;
     },
     submitUser() {
-      this.$refs.userForm.validate(valid => {
+      this.$refs.createForm.validate(valid => {
         if (valid) {
-          let url = "/user/admin/add";
-          if (this.modalType === 1) {
-            // 编辑用户
-            url = "/user/admin/edit";
-          }
-          if (this.modalType === 0) {
-            if (this.userForm.password.length < 6) {
-              this.errorPass = "密码不能为空且长度不得少于6位";
-              return;
-            }
-          }
           this.submitLoading = true;
-          this.postRequest(url, this.userForm).then(res => {
+          this.postBodyRequest("/categorys", this.createForm).then(res => {
             this.submitLoading = false;
-            if (res.success === true) {
+            if (res.status === 200) {
               this.$Message.success("操作成功");
               this.init();
               this.userModalVisible = false;
@@ -488,14 +501,14 @@ export default {
     },
     addUser() {
       this.modalType = 0;
-      this.modalTitle = "添加用户";
-      this.$refs.userForm.resetFields();
+      this.modalTitle = "添加分类";
+      this.$refs.createForm.resetFields();
       this.userModalVisible = true;
     },
     edit(v) {
       this.modalType = 1;
-      this.modalTitle = "编辑用户";
-      this.$refs.userForm.resetFields();
+      this.modalTitle = "编辑分类";
+      this.$refs.createForm.resetFields();
       // 转换null为""
       for (let attr in v) {
         if (v[attr] === null) {
@@ -504,10 +517,10 @@ export default {
       }
       let str = JSON.stringify(v);
       let userInfo = JSON.parse(str);
-      this.userForm = userInfo;
+      this.createForm = userInfo;
       let selectRolesId = [];
-      this.userForm.img=v.wapBannerUrl
-      this.userForm.roles = selectRolesId;
+      this.createForm.img=v.wapBannerUrl
+      this.createForm.roles = selectRolesId;
       this.userModalVisible = true;
     },
     enable(v) {
@@ -541,10 +554,10 @@ export default {
     remove(v) {
       this.$Modal.confirm({
         title: "确认删除",
-        content: "您确认要删除用户 " + v.username + " ?",
+        content: "您确认要删除分类 " + v.name + " ?",
         onOk: () => {
-          this.deleteRequest("/user/delByIds", { ids: v.id }).then(res => {
-            if (res.success === true) {
+          this.deleteRequest("/categorys", { id: v.id }).then(res => {
+            if (res.status === 200) {
               this.$Message.success("删除成功");
               this.init();
             }
@@ -592,7 +605,43 @@ export default {
           });
         }
       });
+    },
+    setDefault(v) {
+      this.$Modal.confirm({
+        title: "确认设置",
+        content: "您确认要设置所选的 " + v.name + " 有效?",
+        onOk: () => {
+        let params = {
+          id: v.id,
+          isShow: 1
+        };
+      this.postBodyRequest("/categorys", params).then(res => {
+        if (res.status === 200) {
+        this.$Message.success("操作成功");
+        this.init();
+      }
+    });
     }
+    });
+    },
+    cancelDefault(v) {
+      this.$Modal.confirm({
+        title: "确认设为无效",
+        content: "您确认要设置所选的 " + v.name + "无效?",
+        onOk: () => {
+        let params = {
+          id: v.id,
+          isShow: 0
+        };
+      this.postBodyRequest("/categorys", params).then(res => {
+        if (res.status === 200) {
+        this.$Message.success("操作成功");
+        this.init();
+      }
+    });
+    }
+    });
+    },
   },
   mounted() {
     this.init();

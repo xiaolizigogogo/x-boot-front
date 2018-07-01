@@ -6,6 +6,28 @@
         <Row>
             <Col>
                 <Card>
+                  <Row>
+                    <Form ref="searchForm" :model="searchForm" inline :label-width="70" class="search-form">
+                      <Form-item label="服务名称" prop="username">
+                        <Input type="text" v-model="searchForm.name" clearable placeholder="请输入服务名" style="width: 200px"/>
+                      </Form-item>
+                      <Form-item label="有效" prop="sex">
+                        <Select v-model="searchForm.enable" placeholder="请选择" clearable style="width: 200px">
+                          <Option value=true>有效</Option>
+                          <Option value=false>无效</Option>
+                        </Select>
+                      </Form-item>
+                      <span v-if="drop">
+                            </span>
+                      <Form-item style="margin-left:-35px;">
+                        <Button @click="handleSearch" type="primary" icon="search">搜索</Button>
+                        <Button @click="handleReset" type="ghost" >重置</Button>
+                        <a class="drop-down" @click="dropDown">{{dropDownContent}}
+                          <Icon :type="dropDownIcon"></Icon>
+                        </a>
+                      </Form-item>
+                    </Form>
+                  </Row>
                     <Row class="operation">
                         <Button @click="addRole" type="primary" icon="plus-round">添加服务项目</Button>
                         <Button @click="delAll" type="ghost" icon="trash-a">批量删除</Button>
@@ -36,6 +58,9 @@
             </FormItem>
             <FormItem label="项目介绍" prop="memo">
               <Input v-model="serviceForm.memo" placeholder="项目介绍"/>
+            </FormItem>
+            <FormItem label="项目金额" prop="price">
+              <InputNumber :max="1000" :min="0" v-model="serviceForm.price"></InputNumber>
             </FormItem>
             <FormItem label="项目图片" prop="image">
               <qiniu
@@ -70,6 +95,10 @@ export default {
   },
   data() {
     return {
+      searchForm:{
+        name:undefined,
+        enable:undefined
+      },
       loading: true,
       treeLoading: true,
       submitPermLoading: false,
@@ -87,7 +116,8 @@ export default {
         id:"",
         enable:true,
         operator:"",
-        orderBy:""
+        orderBy:"",
+        
       },
       serviceFormValidate: {
         name: [{ required: true, message: "角色名称不能为空", trigger: "blur" }]
@@ -95,6 +125,9 @@ export default {
       submitLoading: false,
       selectList: [],
       selectCount: 0,
+      drop: false,
+      dropDownContent: "展开",
+      dropDownIcon: "chevron-down",
       columns: [
         {
           type: "selection",
@@ -258,7 +291,9 @@ export default {
         current: this.pageNumber,
         size: this.pageSize,
         asc: false,
-        descs:"gmtCreate"
+        descs:"gmtCreate",
+        name:this.searchForm.name,
+        enable:this.searchForm.enable
       };
       this.getRequest("/productTypes", params).then(res => {
         this.loading = false;
@@ -354,7 +389,7 @@ export default {
             id: v.id,
             enable: true
           };
-          this.putBodyRequest("/productTypes", params).then(res => {
+          this.postBodyRequest("/productTypes", params).then(res => {
             if (res.status === 200) {
               this.$Message.success("操作成功");
               this.init();
@@ -372,7 +407,7 @@ export default {
             id: v.id,
             enable: false
           };
-          this.putBodyRequest("/productTypes", params).then(res => {
+          this.postBodyRequest("/productTypes", params).then(res => {
             if (res.status === 200) {
               this.$Message.success("操作成功");
               this.init();
@@ -484,6 +519,28 @@ export default {
     },
     cancelPermEdit() {
       this.permModalVisible = false;
+    },
+    handleSearch() {
+      this.pageNumber = 1;
+      this.pageSize = 10;
+      this.init();
+    },
+    handleReset() {
+      this.$refs.searchForm.resetFields();
+      this.pageNumber = 1;
+      this.pageSize = 10;
+      // 重新加载数据
+      this.init();
+    },
+    dropDown() {
+      if (this.drop) {
+        this.dropDownContent = "展开";
+        this.dropDownIcon = "chevron-down";
+      } else {
+        this.dropDownContent = "收起";
+        this.dropDownIcon = "chevron-up";
+      }
+      this.drop = !this.drop;
     }
   },
   mounted() {

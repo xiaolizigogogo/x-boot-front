@@ -16,7 +16,7 @@
                       </Form-item>
                     </Form>
                     <Row class="operation">
-                      <Button @click="clearAll" type="primary" icon="ivu-icon ivu-icon-plus-round">添加商品</Button>
+                      <Button @click="addGoods" type="primary" icon="ivu-icon ivu-icon-plus-round">添加商品</Button>
                       <Button @click="delAll" type="error" icon="trash-a">批量删除</Button>
                       <Button @click="loadData" type="ghost" icon="refresh">刷新</Button>
                     </Row>
@@ -35,6 +35,35 @@
                 </Card>
             </Col>
         </Row>
+      <Modal :title="modalTitle" v-model="roleModalVisible" :mask-closable='false' :width="500">
+        <Form ref="roleForm" :model="roleForm" :label-width="80" :rules="roleFormValidate">
+          <FormItem label="商品名称" prop="name">
+            <Input v-model="roleForm.name" placeholder="按照Spring Security约定建议以‘ROLE_’开头" readonly/>
+          </FormItem>
+          <FormItem label="是否在售" prop="name">
+            <Input v-model="roleForm.name" placeholder="按照Spring Security约定建议以‘ROLE_’开头" readonly/>
+          </FormItem>
+          <FormItem label="零售价格" prop="name">
+            <Input v-model="roleForm.name" placeholder="按照Spring Security约定建议以‘ROLE_’开头"/>
+          </FormItem>
+          <FormItem label="销售库存" prop="name">
+            <Input v-model="roleForm.name" placeholder="按照Spring Security约定建议以‘ROLE_’开头"/>
+          </FormItem>
+          <FormItem label="预约员工" prop="name">
+            <Input v-model="roleForm.name" placeholder="按照Spring Security约定建议以‘ROLE_’开头"/>
+          </FormItem>
+          <FormItem label="预约状态" prop="name">
+            <Input v-model="roleForm.name" placeholder="按照Spring Security约定建议以‘ROLE_’开头"/>
+          </FormItem>
+          <FormItem label="结束状态" prop="name">
+            <Input v-model="roleForm.name" placeholder="按照Spring Security约定建议以‘ROLE_’开头"/>
+          </FormItem>
+        </Form>
+        <div slot="footer">
+          <Button type="text" @click="cancelRole">取消</Button>
+          <Button type="primary" :loading="submitLoading" @click="submitRole">提交</Button>
+        </div>
+      </Modal>
     </div>
 </template>
 
@@ -49,6 +78,11 @@ export default {
       searchKey: "",
       sortColumn: "createTime",
       sortType: "desc",
+      modalTitle:"0 ",
+      roleFormValidate:{},
+      roleForm:{},
+      roleModalVisible:false,
+      submitLoading: false,
       columns: [
         {
           type: "selection",
@@ -92,96 +126,6 @@ export default {
           sortable: true
         },
         {
-          title: "请求类型",
-          key: "requestType",
-          width: 120,
-          align: "center",
-          sortable: true,
-          filters: [
-            {
-              label: "GET",
-              value: "GET"
-            },
-            {
-              label: "POST",
-              value: "POST"
-            },
-            {
-              label: "PUT",
-              value: "PUT"
-            },
-            {
-              label: "DELETE",
-              value: "DELETE"
-            }
-          ],
-          filterMultiple: false,
-          filterMethod(value, row) {
-            if (value === "GET") {
-              return row.requestType === "GET";
-            } else if (value === "POST") {
-              return row.requestType === "POST";
-            } else if (value === "PUT") {
-              return row.requestType === "PUT";
-            } else if (value === "DELETE") {
-              return row.requestType === "DELETE";
-            }
-          }
-        },
-        {
-          title: "请求路径",
-          width: 150,
-          key: "requestUrl"
-        },
-        {
-          title: "请求参数",
-          width: 200,
-          key: "requestParam"
-        },
-        {
-          title: "登录用户",
-          key: "username",
-          width: 105,
-          sortable: true
-        },
-        {
-          title: "IP",
-          key: "ip",
-          width: 100,
-          sortable: true
-        },
-        {
-          title: "IP信息",
-          key: "ipInfo",
-          width: 90,
-          sortable: true
-        },
-        {
-          title: "耗时(毫秒)",
-          key: "costTime",
-          width: 125,
-          sortable: true,
-          align: "center",
-          filters: [
-            {
-              label: "≤1000毫秒",
-              value: 0
-            },
-            {
-              label: ">1000毫秒",
-              value: 1
-            }
-          ],
-          filterMultiple: false,
-          filterMethod(value, row) {
-            if (value === 0) {
-              return row.costTime <= 1000;
-            } else if (value === 1) {
-              return row.costTime > 1000;
-            }
-          }
-        },
-        {
           title: "创建时间",
           key: "addTime",
           sortable: true,
@@ -217,7 +161,9 @@ export default {
       data: [],
       pageNumber: 1,
       pageSize: 10,
-      total: 0
+      total: 0,
+      rules:{},
+    title:""
     };
   },
   methods: {
@@ -324,7 +270,76 @@ export default {
           });
         }
       });
+    },
+    addGoods(){
+        this.modalType = 0;
+        this.modalTitle = "添加角色";
+        this.roleForm = {
+          name: "",
+          access: null
+        };
+        this.roleModalVisible = true;
+    },
+    cancelRole() {
+      this.roleModalVisible = false;
+    },
+    submitRole() {
+      this.$refs.roleForm.validate(valid => {
+        if (valid) {
+          let url = "/role/save";
+          if (this.modalType === 1) {
+            // 编辑用户
+            url = "/role/edit";
+          }
+          this.submitLoading = true;
+          this.postRequest(url, this.roleForm).then(res => {
+            this.submitLoading = false;
+          if (res.success === true) {
+            this.$Message.success("操作成功");
+            this.init();
+            this.roleModalVisible = false;
+          }
+        });
+        }
+      });
+    },
+    addRole() {
+      this.modalType = 0;
+      this.modalTitle = "添加角色";
+      this.roleForm = {
+        name: "",
+        access: null
+      };
+      this.roleModalVisible = true;
+    },
+    edit(v) {
+      this.modalType = 1;
+      this.modalTitle = "编辑角色";
+      // 转换null为""
+      for (let attr in v) {
+        if (v[attr] === null) {
+          v[attr] = "";
+        }
+      }
+      let str = JSON.stringify(v);
+      let roleInfo = JSON.parse(str);
+      this.roleForm = roleInfo;
+      this.roleModalVisible = true;
+    },
+    remove(v) {
+      this.$Modal.confirm({
+        title: "确认删除",
+        content: "您确认要删除角色 " + v.name + " ?",
+        onOk: () => {
+        this.deleteRequest("/role/delAllByIds", { ids: v.id }).then(res => {
+        if (res.success === true) {
+        this.$Message.success("删除成功");
+        this.init();
+      }
+    });
     }
+    });
+    },
   },
   mounted() {
     this.init();

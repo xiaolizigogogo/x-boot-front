@@ -7,7 +7,7 @@
             <Col>
                 <Card>
                     <Row class="operation">
-                        <Button @click="addRole" type="primary" icon="plus-round">添加角色</Button>
+                        <Button @click="addRole" type="primary" icon="plus-round">添加预约</Button>
                         <Button @click="delAll" type="ghost" icon="trash-a">批量删除</Button>
                         <Button @click="init" type="ghost" icon="refresh">刷新</Button>
                     </Row>
@@ -28,7 +28,25 @@
         </Row>
         <Modal :title="modalTitle" v-model="roleModalVisible" :mask-closable='false' :width="500">
           <Form ref="roleForm" :model="roleForm" :label-width="80" :rules="roleFormValidate">
-            <FormItem label="角色名称" prop="name">
+            <FormItem label="客户名称" prop="name">
+              <Input v-model="roleForm.name" placeholder="按照Spring Security约定建议以‘ROLE_’开头" readonly/>
+            </FormItem>
+            <FormItem label="客户手机" prop="name">
+              <Input v-model="roleForm.name" placeholder="按照Spring Security约定建议以‘ROLE_’开头" readonly/>
+            </FormItem>
+            <FormItem label="预约时间" prop="name">
+              <Input v-model="roleForm.name" placeholder="按照Spring Security约定建议以‘ROLE_’开头"/>
+            </FormItem>
+            <FormItem label="预约项目" prop="name">
+              <Input v-model="roleForm.name" placeholder="按照Spring Security约定建议以‘ROLE_’开头"/>
+            </FormItem>
+            <FormItem label="预约员工" prop="name">
+              <Input v-model="roleForm.name" placeholder="按照Spring Security约定建议以‘ROLE_’开头"/>
+            </FormItem>
+            <FormItem label="预约状态" prop="name">
+              <Input v-model="roleForm.name" placeholder="按照Spring Security约定建议以‘ROLE_’开头"/>
+            </FormItem>
+            <FormItem label="结束状态" prop="name">
               <Input v-model="roleForm.name" placeholder="按照Spring Security约定建议以‘ROLE_’开头"/>
             </FormItem>
           </Form>
@@ -118,7 +136,7 @@ export default {
           key: "subscribeDay",
           align: "center",
           render:(h,params)=>{
-            return h('div',params.row.subscribeDay+" "+params.row.subscribeTime)
+            return h('div',params.row.subscribeDay+" "+params.row.subscribeTime+"点")
           }
         },
         {
@@ -148,24 +166,6 @@ export default {
           width: 200,
           render: (h, params) => {
             return h("div", [
-              h(
-                "Button",
-                {
-                  props: {
-                    type: "warning",
-                    size: "small"
-                  },
-                  style: {
-                    marginRight: "5px"
-                  },
-                  on: {
-                    click: () => {
-                      this.editPerm(params.row);
-                    }
-                  }
-                },
-                "分配权限"
-              ),
               h(
                 "Button",
                 {

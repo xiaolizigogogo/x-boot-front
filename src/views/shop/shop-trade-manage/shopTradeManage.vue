@@ -358,7 +358,7 @@ export default {
           v[attr] = "";
         }
       }
-      this.editForm.nideshopTrade.memberName=v.username;
+      this.editForm.nideshopTrade.memberName=v.memberName;
       this.editForm.nideshopTrade.memberId=v.id;
       this.editForm.nideshopTrade.tradeType=n;
       this.editModalVisible = true;

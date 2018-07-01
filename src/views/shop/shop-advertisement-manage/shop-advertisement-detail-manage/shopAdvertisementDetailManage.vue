@@ -35,7 +35,7 @@
               <Input v-model="roleForm.content" placeholder="描述"/>
             </FormItem>
             <FormItem label="图片链接" prop="name">
-              <Input v-model="roleForm.imageUrl" placeholder="图片链接"/>
+                <Input v-model="roleForm.imageUrl" placeholder="图片链接"/>
             </FormItem>
             <FormItem label="广告链接" prop="name">
               <Input v-model="roleForm.link" placeholder="广告链接"/>
@@ -63,6 +63,7 @@
 
 <script>
 import {formatDate} from '../../../../utils/global'
+import qiniu from '../../../my-components/image-upload/qiniu'
 export default {
   name: "shop-advertisement-detail-manage",
   data() {
@@ -127,6 +128,26 @@ export default {
           title: "图片链接",
           key: "imageUrl",
           align: "center",
+          render: (h, params) => {
+          return h('div', {
+            attrs: {
+              style: 'width: 80px;height: 80px;'
+            },
+          }, [
+            h('img', {
+              props: {
+                type: 'primary',
+                size: 'small'
+              },
+              attrs: {
+                src: params.row.imageUrl, style: 'width: 80px;height: 80px;border-radius: 2px;'
+              },
+              style: {
+              },
+            }),
+          ]);
+        }
+
         },
         {
           title: "广告链接",
