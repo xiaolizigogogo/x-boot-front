@@ -38,25 +38,65 @@
       <Modal :title="modalTitle" v-model="roleModalVisible" :mask-closable='false' :width="500">
         <Form ref="roleForm" :model="roleForm" :label-width="80" :rules="roleFormValidate">
           <FormItem label="商品名称" prop="name">
-            <Input v-model="roleForm.name" placeholder="按照Spring Security约定建议以‘ROLE_’开头" readonly/>
+            <Input v-model="roleForm.name" placeholder="商品名称"/>
+          </FormItem>
+          <FormItem label="商品简介" prop="goodsBrief">
+            <Input v-model="roleForm.goodsBrief" placeholder="商品简介" />
           </FormItem>
           <FormItem label="是否在售" prop="name">
-            <Input v-model="roleForm.name" placeholder="按照Spring Security约定建议以‘ROLE_’开头" readonly/>
+            <Select v-model="roleForm.isOnSale" placeholder="请选择" clearable style="width: 200px">
+              <Option value=0>不显示</Option>
+              <Option value=1>显示</Option>
+            </Select>
           </FormItem>
           <FormItem label="零售价格" prop="name">
-            <Input v-model="roleForm.name" placeholder="按照Spring Security约定建议以‘ROLE_’开头"/>
+            <InputNumber :max="1000" :min="0" v-model="roleForm.retailPrice"></InputNumber>
           </FormItem>
-          <FormItem label="销售库存" prop="name">
-            <Input v-model="roleForm.name" placeholder="按照Spring Security约定建议以‘ROLE_’开头"/>
+          <FormItem label="实际价格" prop="name">
+            <InputNumber :max="1000" :min="0" v-model="roleForm.extraPrice"></InputNumber>
           </FormItem>
-          <FormItem label="预约员工" prop="name">
-            <Input v-model="roleForm.name" placeholder="按照Spring Security约定建议以‘ROLE_’开头"/>
+          <FormItem label="排序值" prop="name">
+            <InputNumber :max="1000" :min="0" v-model="roleForm.sortOrder"></InputNumber>
           </FormItem>
-          <FormItem label="预约状态" prop="name">
-            <Input v-model="roleForm.name" placeholder="按照Spring Security约定建议以‘ROLE_’开头"/>
+          <FormItem label="是否新品" prop="name">
+            <Select v-model="roleForm.isNew" placeholder="请选择" clearable style="width: 200px">
+              <Option value=0>否</Option>
+              <Option value=1>是</Option>
+            </Select>
           </FormItem>
-          <FormItem label="结束状态" prop="name">
-            <Input v-model="roleForm.name" placeholder="按照Spring Security约定建议以‘ROLE_’开头"/>
+          <FormItem label="库存单位" prop="name">
+            <Input v-model="roleForm.goodsUnit" placeholder="条/件"/>
+          </FormItem>
+          <FormItem label="促销描述" prop="name">
+            <Input v-model="roleForm.promotionDesc" placeholder="促销描述"/>
+          </FormItem>
+          <FormItem label="列表图片" prop="name">
+            <qiniu
+              @handleSuccess = "(url) => this.roleForm.listPicUrl = url" :imgUrl="this.listPicUrl">
+            </qiniu>
+          </FormItem>
+          <FormItem label="详情主图片" prop="name">
+            <qiniu
+              @handleSuccess = "(url) => this.roleForm.primaryPicUrl = url" :imgUrl="this.primaryPicUrl">
+            </qiniu>
+          </FormItem>
+          <FormItem label="详情主产品" prop="name">
+            <Input v-model="roleForm.primaryProductId" placeholder="详情主产品"/>
+          </FormItem>
+          <FormItem label="所属分类" prop="name">
+            <Input v-model="roleForm.categoryId" placeholder="按照Spring Security约定建议以‘ROLE_’开头"/>
+          </FormItem>
+          <FormItem label="是否限购" prop="name">
+            <Input v-model="roleForm.isLimited" placeholder="按照Spring Security约定建议以‘ROLE_’开头"/>
+          </FormItem>
+          <FormItem label="是否热销" prop="name">
+            <Input v-model="roleForm.isHot" placeholder="按照Spring Security约定建议以‘ROLE_’开头"/>
+          </FormItem>
+          <FormItem label="销售量" prop="name">
+            <Input v-model="roleForm.sellVolume" placeholder="按照Spring Security约定建议以‘ROLE_’开头"/>
+          </FormItem>
+          <FormItem label="库存量" prop="name">
+            <Input v-model="roleForm.goodsNumber" placeholder="按照Spring Security约定建议以‘ROLE_’开头"/>
           </FormItem>
         </Form>
         <div slot="footer">
@@ -68,10 +108,14 @@
 </template>
 
 <script>
+  import qiniu from '../../my-components/image-upload/qiniu'
+  import {formatDate,fmoney} from '../../../utils/global'
 export default {
   name: "shop-goods-manage",
   data() {
     return {
+      primaryPicUrl:undefined,
+      listPicUrl:undefined,
       loading: true,
       selectList: [],
       selectCount: 0,

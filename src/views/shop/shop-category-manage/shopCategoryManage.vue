@@ -18,10 +18,10 @@
                               <Form-item label="父类型" prop="parentId">
                                 <Input type="text" v-model="searchForm.parentId" clearable placeholder="请输入父类型" style="width: 200px"/>
                               </Form-item>
-                              <Form-item label="是否显示" prop="sex">
+                              <Form-item label="是否显示" prop="isShow">
                                 <Select v-model="searchForm.isShow" placeholder="请选择" clearable style="width: 200px">
-                                  <Option value="0">不显示</Option>
-                                  <Option value="1">显示</Option>
+                                  <Option value=0>不显示</Option>
+                                  <Option value=1>显示</Option>
                                 </Select>
                               </Form-item>
                             </span>
@@ -70,12 +70,8 @@
                 <Input type="text" v-model="createForm.name" clearable placeholder="请输入名称" style="width: 200px"/>
               </Form-item>
                               <Form-item label="父类型" prop="parentId">
-                                <Input type="text" v-model="createForm.parentId" clearable placeholder="请输入父类型" style="width: 200px"/>
-                              </Form-item>
-                              <Form-item label="是否显示" prop="sex">
-                                <Select v-model="createForm.isShow" placeholder="请选择" clearable style="width: 200px">
-                                  <Option value="0">不显示</Option>
-                                  <Option value="1">显示</Option>
+                                <Select v-model="createForm.parentId">
+                                  <Option v-for="item in parentTypes" :value="item.id" :key="item.id">{{ item.name }}</Option>
                                 </Select>
                               </Form-item>
               <Form-item label="图标" prop="bannerUrl">
@@ -90,16 +86,15 @@
               <Form-item label="前台描述" prop="frontDesc">
                 <Input type="text" v-model="createForm.frontDesc" clearable placeholder="请输入前台描述" style="width: 200px"/>
               </Form-item>
-              <Form-item label="图片路径" prop="imgUrl">
-                <Input type="text" v-model="createForm.imgUrl" clearable placeholder="请输入图片路径" style="width: 200px"/>
-              </Form-item>
+              <!--<Form-item label="图片路径" prop="imgUrl">-->
+                <!--<Input type="text" v-model="createForm.imgUrl" clearable placeholder="请输入图片路径" style="width: 200px"/>-->
+              <!--</Form-item>-->
               <Form-item label="网页图片" prop="wapBannerUrl">
-                <Input type="text" v-model="createForm.wapBannerUrl" clearable placeholder="请输入父类型" style="width: 200px"/>
+                <qiniu
+                  @handleSuccess = "(url) => this.createForm.wapBannerUrl = url" :imgUrl="this.img">
+                </qiniu>
+                <!--<Input type="text" v-model="createForm.wapBannerUrl" clearable placeholder="请输入父类型" style="width: 200px"/>-->
               </Form-item>
-
-              <qiniu
-                @handleSuccess = "(url) => this.createForm.litpic = url" :imgUrl="this.createForm.img">
-              </qiniu>
             </Form>
             <div slot="footer">
                 <Button type="text" @click="cancelUser">取消</Button>
@@ -136,20 +131,25 @@ export default {
       dropDownIcon: "chevron-down",
       selectCount: 0,
       selectList: [],
+      parentTypes:[],
+      parentTypesMap:{},
+      img:"",
       searchForm: {
         id: "",
         name: "",
         parentId: "",
-        isShow: "",
+        isShow: 1,
         sortOrder: "",
         wapBannerUrl: "",
         pageNumber: 1,
         pageSize: 10,
+        descs:"sortOrder",
+        isAscs:false
       },
       createForm:{
         name:"",
         parentId:"",
-        isShow:"",
+        isShow:1,
         sortOrder:"",
         wapBannerUrl:"",
         frontDesc:"",
@@ -433,6 +433,18 @@ export default {
           this.total = res.data.total;
         }
       });
+      this.getRequest("/categorys", {current:1,size:1000,descs:"sortOrder",parentId:0}).then(res => {
+        if (res.status === 200) {
+        this.parentTypes=[];
+        this.parentTypesMap={}
+        this.parentTypes.push({id:0,name:"父类型"})
+        this.parentTypesMap[0]="父类型"
+        res.data.records.forEach(item=>{
+          this.parentTypes.push({id:item.id,name:item.name})
+         this.parentTypesMap[item.id]=item.name
+      })
+      }
+    });
     },
     handleSearch() {
       this.searchForm.pageNumber = 1;
@@ -503,6 +515,8 @@ export default {
       this.modalType = 0;
       this.modalTitle = "添加分类";
       this.$refs.createForm.resetFields();
+      this.createForm={}
+      this.img=undefined
       this.userModalVisible = true;
     },
     edit(v) {
@@ -519,7 +533,7 @@ export default {
       let userInfo = JSON.parse(str);
       this.createForm = userInfo;
       let selectRolesId = [];
-      this.createForm.img=v.wapBannerUrl
+      this.img=v.wapBannerUrl
       this.createForm.roles = selectRolesId;
       this.userModalVisible = true;
     },

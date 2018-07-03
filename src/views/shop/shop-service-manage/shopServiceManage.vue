@@ -30,8 +30,9 @@
                   </Row>
                     <Row class="operation">
                         <Button @click="addRole" type="primary" icon="plus-round">添加服务项目</Button>
-                        <Button @click="delAll" type="ghost" icon="trash-a">批量删除</Button>
+                        <!--<Button @click="delAll" type="ghost" icon="trash-a">批量删除</Button>-->
                         <Button @click="init" type="ghost" icon="refresh">刷新</Button>
+                      parent
                     </Row>
                      <Row>
                         <Alert show-icon>
@@ -62,11 +63,19 @@
             <FormItem label="项目金额" prop="price">
               <InputNumber :max="1000" :min="0" v-model="serviceForm.price"></InputNumber>
             </FormItem>
-            <FormItem label="项目图片" prop="image">
-              <qiniu
-                @handleSuccess = "(url) => this.serviceForm.img = url" >
-              </qiniu>
+            <FormItem label="项目排序" prop="orderBy">
+              <InputNumber :max="1000" :min="0" v-model="serviceForm.orderBy"></InputNumber>
             </FormItem>
+            <FormItem label="项目类型" prop="type">
+              <Select v-model="serviceForm.type" filterable>
+                <Option v-for="item in parentTypes" :value="item.id" :key="item.id">{{ item.name }}</Option>
+              </Select>
+            </FormItem>
+            <!--<FormItem label="项目图片" prop="image">-->
+              <!--<qiniu-->
+                <!--@handleSuccess = "(url) => this.serviceForm.img = url" >-->
+              <!--</qiniu>-->
+            <!--</FormItem>-->
           </Form>
           <div slot="footer">
             <Button type="text" @click="cancelRole">取消</Button>
@@ -87,7 +96,7 @@
 
 <script>
   import qiniu from '../../my-components/image-upload/qiniu'
-  import {formatDate} from '../../../utils/global'
+  import {formatDate,fmoney} from '../../../utils/global'
 export default {
   name: "shop-service-manage",
   components:{
@@ -99,6 +108,7 @@ export default {
         name:undefined,
         enable:undefined
       },
+      parentTypes:[],
       loading: true,
       treeLoading: true,
       submitPermLoading: false,
@@ -109,15 +119,16 @@ export default {
       permModalVisible: false,
       modalTitle: "",
       serviceForm: {
-        name: "",
-        code: "",
-        memo:"",
-        img:"",
-        id:"",
+        name: undefined,
+        code: undefined,
+        memo:undefined,
+        img:undefined,
+        id:undefined,
         enable:true,
-        operator:"",
-        orderBy:"",
-        
+        operator:undefined,
+        orderBy:0,
+        type:undefined,
+        price:0
       },
       serviceFormValidate: {
         name: [{ required: true, message: "角色名称不能为空", trigger: "blur" }]
@@ -138,6 +149,30 @@ export default {
           title: "服务名称",
           key: "name",
           sortable: true
+        },
+        {
+          title: "排序值",
+          key: "orderBy",
+          sortable: true
+        },
+        {
+          title: "价格",
+          key: "price",
+          sortable: true,
+          render:(h,params)=>{
+          return h('div',
+            fmoney(params.row.price));/*这里的this.row能够获取当前行的数据*/
+  }
+        },
+        {
+          title: "类型",
+          key: "type",
+          sortable: true,
+          render:(h,params)=>{
+          return h('div',
+            this.parentTypesMap[params.row.type]
+           );/*这里的this.row能够获取当前行的数据*/
+  }
         },
         {
           title: "创建时间",
@@ -254,6 +289,7 @@ export default {
           }
         }
       ],
+    parentTypesMap:{},
       data: [],
       pageNumber: 1,
       pageSize: 10,
@@ -297,11 +333,23 @@ export default {
       };
       this.getRequest("/productTypes", params).then(res => {
         this.loading = false;
-        if (res.status === 200) {
+        if (res.status == 200) {
           this.data = res.data.records;
           this.total = res.data.total;
         }
       });
+      this.getRequest("/productTypes", {current:1,size:1000,asc:true,descs:'orderBy',enable:true,type:0}).then(res => {
+      if (res.status === 200) {
+        this.parentTypes=[];
+        this.parentTypesMap={}
+        this.parentTypes.push({id:0,name:"父类型"})
+        this.parentTypesMap[0]="父类型"
+        res.data.records.forEach(item=>{
+          this.parentTypes.push({id:item.id,name:item.name})
+        this.parentTypesMap[item.id]=item.name
+      })
+      }
+    });
     },
     // 递归删除禁用节点
     deleteDisableNode(permData) {
@@ -341,14 +389,16 @@ export default {
       this.modalType = 0;
       this.modalTitle = "添加服务项目";
       this.serviceForm={
-          name: "",
-          code: "",
-          memo:"",
-          img:"",
-          id:"",
+          name: undefined,
+          code: undefined,
+          memo:undefined,
+          img:undefined,
+          id:undefined,
           enable:true,
-          operator:"",
-          orderBy:""
+          operator:undefined,
+          orderBy:0,
+          price:0,
+          type:0
       },
       this.roleModalVisible = true;
     },
@@ -372,7 +422,7 @@ export default {
         content: "您确认要删除 " + v.name + " ?",
         onOk: () => {
           this.deleteRequest("/productTypes", { id: v.id }).then(res => {
-            if (res.status === 200) {
+            if (res.status == 200) {
               this.$Message.success("删除成功");
               this.init();
             }
@@ -390,7 +440,7 @@ export default {
             enable: true
           };
           this.postBodyRequest("/productTypes", params).then(res => {
-            if (res.status === 200) {
+            if (res.status == 200) {
               this.$Message.success("操作成功");
               this.init();
             }
@@ -408,7 +458,7 @@ export default {
             enable: false
           };
           this.postBodyRequest("/productTypes", params).then(res => {
-            if (res.status === 200) {
+            if (res.status == 200) {
               this.$Message.success("操作成功");
               this.init();
             }

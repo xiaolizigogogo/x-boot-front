@@ -1,11 +1,11 @@
 <template>
   <div>
     <div class="demo-upload-list" v-for="(item,index) in uploadList" :key="index">
-      <template v-if="item.status === 'finished'">
+      <template v-if="item.status == 'finished'">
         <img :src="item.url">
         <div class="demo-upload-list-cover">
           <Icon type="ios-eye-outline" @click.native="handleView(item.name)"></Icon>
-          <Icon type="ios-trash-outline" @click.native="handleRemove(item)"></Icon>
+          <Icon type="ios-trash-outline" @click.native="handleRemove(index)"></Icon>
         </div>
       </template>
       <template v-else>
@@ -70,9 +70,7 @@
         actionUrl:qiniuConfig.action_url,
         fileList:[],
         uploadList:[],
-        defaultList:[ {
-          url: ""
-        }]
+        defaultList:[]
       };
     },
     methods: {
@@ -84,15 +82,16 @@
         this.visible = true;
       },
       handleRemove(file) {
-        const fileList = this.$refs.upload.fileList;
-        this.$refs.upload.fileList.splice(fileList.indexOf(file), 1);
+        this.$refs.upload.fileList.splice(file,1);
+        this.defaultList.splice(file,1);
+        this.uploadList.splice(file,1);
       },
       handleSuccess(res, file) {
-        console.log(this.uploadList);
-        console.log(this.defaultList);
-        console.log(this.fileList);
         file.url = res.result;
         file.name = res.result;
+        this.defaultList.push(file)
+        this.$refs.upload.fileList.push(file)
+        this.uploadList.push(file)
         this.$emit('handleSuccess', res.result);//传递给父组件
       },
       handleFormatError(file) {
@@ -123,13 +122,19 @@
     mounted() {
       this.getToken();
       this.uploadList = this.$refs.upload.fileList;
-      console.log(this.imgList);
     },
     watch:{
       imgUrl:function(var1,oldVar){
-        console.log(var1);
-        this.defaultList[0].url =var1;
-        this.uploadList = this.$refs.upload.fileList;
+        console.log(var1)
+        this.$refs.upload.fileList=[];
+        this.defaultList=[]
+        this.uploadList=[]
+        if(var1!=undefined){
+          this.$refs.upload.fileList.push({url:var1,status:"finished",name:var1})
+          this.defaultList.push({url:var1,status:"finished",name:var1})
+          this.uploadList.push({url:var1,status:"finished",name:var1})
+        }
+
       }
     }
   };
