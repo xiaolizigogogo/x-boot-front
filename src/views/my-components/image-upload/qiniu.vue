@@ -92,7 +92,7 @@
         this.defaultList.push(file)
         this.$refs.upload.fileList.push(file)
         this.uploadList.push(file)
-        this.imgUrl=file.url
+        // this.imgUrl=file.url
         this.$emit('handleSuccess', res.result);//传递给父组件
       },
       handleFormatError(file) {

@@ -31,19 +31,11 @@
             <FormItem label="名称" prop="name">
               <Input v-model="roleForm.name" placeholder="名称"/>
             </FormItem>
-            <FormItem label="描述" prop="name">
-              <Input v-model="roleForm.content" placeholder="描述"/>
+            <FormItem label="描述" prop="value">
+              <Input v-model="roleForm.value" placeholder="描述"/>
             </FormItem>
-            <FormItem label="图片链接" prop="name">
-              <qiniu
-                @handleSuccess = "(url) => this.roleForm.imageUrl = url" :imgUrl="this.imageUrl">
-              </qiniu>
-            </FormItem>
-            <FormItem label="广告链接" prop="name">
-              <Input v-model="roleForm.link" placeholder="广告链接"/>
-            </FormItem>
-            <FormItem label="结束时间" prop="name">
-              <Input v-model="roleForm.endTime" placeholder="结束时间"/>
+            <FormItem label="排序值" prop="name">
+              <Input v-model="roleForm.attributeId" placeholder="名称"/>
             </FormItem>
           </Form>
           <div slot="footer">
@@ -84,12 +76,9 @@ export default {
       modalTitle: "",
       roleForm: {
         name: "",
-        imageUrl:"",
-        enabled:1,
-        link:"",
-        endTime:"",
-        mediaType:1,
-        adPositionId:this.$route.query.id
+        value:"",
+        goodsId:this.$route.query.id,
+        attributeId:undefined
       },
       imageUrl:undefined,
       roleFormValidate: {
@@ -115,48 +104,13 @@ export default {
           align: "center",
         },
         {
-          title: "结束时间",
-          key: "endTime",
-          sortable: true,
-          sortType: "desc",
-          render:(h,params)=>{
-            return h('div',
-              formatDate(new Date(params.row.endTime*1000)));/*这里的this.row能够获取当前行的数据*/
-          }
-        },
-        {
           title: "描述",
-          key: "content",
+          key: "value",
           align: "center",
         },
         {
-          title: "图片链接",
-          key: "imageUrl",
-          align: "center",
-          render: (h, params) => {
-          return h('div', {
-            attrs: {
-              style: 'width: 80px;height: 80px;'
-            },
-          }, [
-            h('img', {
-              props: {
-                type: 'primary',
-                size: 'small'
-              },
-              attrs: {
-                src: params.row.imageUrl, style: 'width: 80px;height: 80px;border-radius: 2px;'
-              },
-              style: {
-              },
-            }),
-          ]);
-        }
-
-        },
-        {
-          title: "广告链接",
-          key: "link",
+          title: "排序值",
+          key: "attributeId",
           align: "center",
         },
         {
@@ -219,11 +173,11 @@ export default {
     },
     changePage(v) {
       this.pageNumber = v;
-      this.getRoleList();
+      this.loadData();
     },
     changePageSize(v) {
       this.pageSize = v;
-      this.getRoleList();
+      this.loadData();
     },
     changeSort(e) {
       this.sortColumn = e.key;
@@ -231,19 +185,18 @@ export default {
       if (e.order === "normal") {
         this.sortType = "";
       }
-      this.getRoleList();
+      this.loadData();
     },
     loadData() {
       this.loading = true;
       let params = {
-        adPositionId: this.$route.query.id,
-        enabled: 1,
+        goodsId: this.$route.query.id,
         current:this.pageNumber,
         size:this.pageSize,
         asc: false,
         descs:"id"
       };
-      this.getRequest("/adPositions/"+this.$route.query.id, params).then(res => {
+      this.getRequest("/goods/attributes/", params).then(res => {
         this.loading = false;
         if (res.status === 200) {
           this.data = res.data.records;
@@ -269,37 +222,29 @@ export default {
     },
     submitRole() {
       this.$refs.roleForm.validate(valid => {
-        if (valid) {
-          let url = "/role/save";
-          if (this.modalType === 1) {
-            // 编辑用户
-            url = "/role/edit";
-          }
           this.submitLoading = true;
-          this.postRequest(url, this.roleForm).then(res => {
+          this.postBodyRequest("/goods/attributes", this.roleForm).then(res => {
             this.submitLoading = false;
-            if (res.success === true) {
+            if (res.status == 200) {
               this.$Message.success("操作成功");
               this.init();
               this.roleModalVisible = false;
             }
-          });
-        }
+        })
       });
     },
     addRole() {
       this.modalType = 0;
-      this.modalTitle = "添加广告";
+      this.modalTitle = "添加参数";
       this.roleForm = {
         name: "",
-        access: null
+        goodsId:this.$route.query.id,
       };
-      this.imgUrl=undefined;
       this.roleModalVisible = true;
     },
     edit(v) {
       this.modalType = 1;
-      this.modalTitle = "编辑角色";
+      this.modalTitle = "编辑参数";
       // 转换null为""
       for (let attr in v) {
         if (v[attr] === null) {
@@ -310,16 +255,16 @@ export default {
       let roleInfo = JSON.parse(str);
       console.log(roleInfo)
       this.roleForm = roleInfo;
-      this.imageUrl=this.roleForm.imageUrl
+      this.roleForm.goodsId=this.$route.query.id,
       this.roleModalVisible = true;
     },
     remove(v) {
       this.$Modal.confirm({
         title: "确认删除",
-        content: "您确认要删除角色 " + v.name + " ?",
+        content: "您确认要删除参数 " + v.name + " ?",
         onOk: () => {
-          this.deleteRequest("/role/delAllByIds", { ids: v.id }).then(res => {
-            if (res.success === true) {
+          this.deleteRequest("/goods/attributes", { id: v.id }).then(res => {
+            if (res.status === 200) {
               this.$Message.success("删除成功");
               this.init();
             }
