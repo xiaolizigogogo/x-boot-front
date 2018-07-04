@@ -337,6 +337,46 @@ export default {
                 }
               },
               "编辑"
+            ),h(
+              "Button",
+              {
+                props: {
+                  type: "primary",
+                  size: "small"
+                },
+                style: {
+                  marginRight: "5px"
+                },
+                on: {
+                  click: () => {
+                    this.$router.push({
+                      name: "shop-goods-attribute-detail-manage",
+                      query: {id:params.row.id}
+                    });
+                  }
+                }
+              },
+              "参数编辑"
+            ),h(
+              "Button",
+              {
+                props: {
+                  type: "primary",
+                  size: "small"
+                },
+                style: {
+                  marginRight: "5px"
+                },
+                on: {
+                  click: () => {
+                    this.$router.push({
+                      name: "shop-goods-gallery-detail-manage",
+                      query: {id:params.row.id}
+                    });
+                  }
+                }
+              },
+              "图片编辑"
             ),
               h(
                 "Button",

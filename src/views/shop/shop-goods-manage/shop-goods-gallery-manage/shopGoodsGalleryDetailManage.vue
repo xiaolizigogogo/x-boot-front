@@ -1,5 +1,5 @@
 <style lang="less">
-@import "shopAdvertisementDetailManage.less";
+@import "shopGoodsGalleryDetailManage.less";
 </style>
 <template>
     <div class="search">
@@ -7,7 +7,7 @@
             <Col>
                 <Card>
                     <Row class="operation">
-                        <Button @click="addRole" type="primary" icon="plus-round">添加广告</Button>
+                        <Button @click="addRole" type="primary" icon="plus-round">添加参数</Button>
                         <Button @click="delAll" type="ghost" icon="trash-a">批量删除</Button>
                         <Button @click="init" type="ghost" icon="refresh">刷新</Button>
                     </Row>
@@ -67,7 +67,7 @@
 import {formatDate} from '../../../../utils/global'
 import qiniu from '../../../my-components/image-upload/qiniu'
 export default {
-  name: "shop-advertisement-detail-manage",
+  name: "shop-goods-gallery-detail-manage",
   components:{
     qiniu
   },

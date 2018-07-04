@@ -29,25 +29,25 @@
         <Modal :title="modalTitle" v-model="roleModalVisible" :mask-closable='false' :width="500">
           <Form ref="roleForm" :model="roleForm" :label-width="80" :rules="roleFormValidate">
             <FormItem label="客户名称" prop="name">
-              <Input v-model="roleForm.name" placeholder="按照Spring Security约定建议以‘ROLE_’开头" readonly/>
+              <Input v-model="roleForm.name" placeholder="客户名称" readonly/>
             </FormItem>
             <FormItem label="客户手机" prop="name">
-              <Input v-model="roleForm.name" placeholder="按照Spring Security约定建议以‘ROLE_’开头" readonly/>
+              <Input v-model="roleForm.name" placeholder="客户手机" readonly/>
             </FormItem>
             <FormItem label="预约时间" prop="name">
-              <Input v-model="roleForm.name" placeholder="按照Spring Security约定建议以‘ROLE_’开头"/>
+              <Input v-model="roleForm.name" placeholder="预约时间"/>
             </FormItem>
             <FormItem label="预约项目" prop="name">
-              <Input v-model="roleForm.name" placeholder="按照Spring Security约定建议以‘ROLE_’开头"/>
+              <Input v-model="roleForm.name" placeholder="预约项目"/>
             </FormItem>
             <FormItem label="预约员工" prop="name">
-              <Input v-model="roleForm.name" placeholder="按照Spring Security约定建议以‘ROLE_’开头"/>
+              <Input v-model="roleForm.name" placeholder="预约员工"/>
             </FormItem>
             <FormItem label="预约状态" prop="name">
-              <Input v-model="roleForm.name" placeholder="按照Spring Security约定建议以‘ROLE_’开头"/>
+              <Input v-model="roleForm.name" placeholder="预约状态"/>
             </FormItem>
             <FormItem label="结束状态" prop="name">
-              <Input v-model="roleForm.name" placeholder="按照Spring Security约定建议以‘ROLE_’开头"/>
+              <Input v-model="roleForm.name" placeholder="结束状态"/>
             </FormItem>
           </Form>
           <div slot="footer">
@@ -287,7 +287,7 @@ export default {
     },
     addRole() {
       this.modalType = 0;
-      this.modalTitle = "添加角色";
+      this.modalTitle = "添加预约";
       this.roleForm = {
         name: "",
         access: null
@@ -296,7 +296,7 @@ export default {
     },
     edit(v) {
       this.modalType = 1;
-      this.modalTitle = "编辑角色";
+      this.modalTitle = "编辑预约";
       // 转换null为""
       for (let attr in v) {
         if (v[attr] === null) {
@@ -311,10 +311,10 @@ export default {
     remove(v) {
       this.$Modal.confirm({
         title: "确认删除",
-        content: "您确认要删除角色 " + v.name + " ?",
+        content: "您确认要删除预约 " + v.subscribeId + " ?",
         onOk: () => {
-          this.deleteRequest("/role/delAllByIds", { ids: v.id }).then(res => {
-            if (res.success === true) {
+          this.deleteRequest("/subscribes", { id: v.id }).then(res => {
+            if (res.status == 200) {
               this.$Message.success("删除成功");
               this.init();
             }

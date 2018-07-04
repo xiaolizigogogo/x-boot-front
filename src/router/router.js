@@ -77,6 +77,18 @@ export const otherRouter = {
         name: 'shop-advertisement-detail-manage',
         title: '广告详情',
         component: () => import('@/views/shop/shop-advertisement-manage/shop-advertisement-detail-manage/shopAdvertisementDetailManage.vue')
+      },
+      {
+        path: '/shop/shop-goods-manage/shop-goods-attribute-detail-manage',
+        name: 'shop-goods-attribute-detail-manage',
+        title: '商品参数详情',
+        component: () => import('@/views/shop/shop-goods-manage/shop-goods-attribute-manage/shopGoodsAttributeDetailManage.vue')
+      },
+      {
+        path: '/shop/shop-goods-manage/shop-goods-gallery-detail-manage',
+        name: 'shop-goods-gallery-detail-manage',
+        title: '商品图片详情',
+        component: () => import('@/views/shop/shop-goods-manage/shop-goods-gallery-manage/shopGoodsGalleryDetailManage.vue')
       }
     ]
 };
