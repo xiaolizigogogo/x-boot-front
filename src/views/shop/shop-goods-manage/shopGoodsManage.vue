@@ -7,7 +7,7 @@
             <Col>
                 <Card>
                     <Form inline :label-width="70" class="search-form">
-                      <Form-item label="搜索日志">
+                      <Form-item label="搜索">
                         <Input type="text" v-model="searchKey" clearable placeholder="请输入搜索关键词" style="width: 300px"/>
                       </Form-item>
                       <Form-item style="margin-left:-35px;">
@@ -43,10 +43,9 @@
           <FormItem label="商品简介" prop="goodsBrief">
             <Input v-model="roleForm.goodsBrief" placeholder="商品简介" />
           </FormItem>
-          <FormItem label="是否在售" prop="name">
-            <Select v-model="roleForm.isOnSale" placeholder="请选择" clearable style="width: 200px">
-              <Option value=0>不显示</Option>
-              <Option value=1>显示</Option>
+          <FormItem label="是否在售" prop="isOnSale">
+            <Select v-model="roleForm.isOnSale" filterable placeholder="请选择" >
+              <Option v-for="item in yesOptions" :value="item.value" :key="item.value">{{ item.label }}</Option>
             </Select>
           </FormItem>
           <FormItem label="零售价格" prop="name">
@@ -59,9 +58,8 @@
             <InputNumber :max="1000" :min="0" v-model="roleForm.sortOrder"></InputNumber>
           </FormItem>
           <FormItem label="是否新品" prop="name">
-            <Select v-model="roleForm.isNew" placeholder="请选择" clearable style="width: 200px">
-              <Option value=0>否</Option>
-              <Option value=1>是</Option>
+            <Select v-model="roleForm.isNew" filterable placeholder="请选择" >
+              <Option v-for="item in yesOptions" :value="item.value" :key="item.value">{{ item.label }}</Option>
             </Select>
           </FormItem>
           <FormItem label="库存单位" prop="name">
@@ -84,19 +82,23 @@
             <Input v-model="roleForm.primaryProductId" placeholder="详情主产品"/>
           </FormItem>
           <FormItem label="所属分类" prop="name">
-            <Input v-model="roleForm.categoryId" placeholder="按照Spring Security约定建议以‘ROLE_’开头"/>
+            <Cascader :data="parentTypes"  :load-data="load" v-model="roleForm.categoryIds" placeholder="请选择" :render-format="formatType"></Cascader>
           </FormItem>
           <FormItem label="是否限购" prop="name">
-            <Input v-model="roleForm.isLimited" placeholder="按照Spring Security约定建议以‘ROLE_’开头"/>
+            <Select v-model="roleForm.isLimited" filterable placeholder="请选择" >
+              <Option v-for="item in yesOptions" :value="item.value" :key="item.value">{{ item.label }}</Option>
+            </Select>
           </FormItem>
           <FormItem label="是否热销" prop="name">
-            <Input v-model="roleForm.isHot" placeholder="按照Spring Security约定建议以‘ROLE_’开头"/>
+            <Select v-model="roleForm.isHot" filterable placeholder="请选择" >
+              <Option v-for="item in yesOptions" :value="item.value" :key="item.value">{{ item.label }}</Option>
+            </Select>
           </FormItem>
           <FormItem label="销售量" prop="name">
-            <Input v-model="roleForm.sellVolume" placeholder="按照Spring Security约定建议以‘ROLE_’开头"/>
+            <Input v-model="roleForm.sellVolume" placeholder="销售量"/>
           </FormItem>
           <FormItem label="库存量" prop="name">
-            <Input v-model="roleForm.goodsNumber" placeholder="按照Spring Security约定建议以‘ROLE_’开头"/>
+            <Input v-model="roleForm.goodsNumber" placeholder="库存量"/>
           </FormItem>
         </Form>
         <div slot="footer">
@@ -112,6 +114,9 @@
   import {formatDate,fmoney} from '../../../utils/global'
 export default {
   name: "shop-goods-manage",
+  components:{
+    qiniu
+  },
   data() {
     return {
       primaryPicUrl:undefined,
@@ -124,7 +129,26 @@ export default {
       sortType: "desc",
       modalTitle:"0 ",
       roleFormValidate:{},
-      roleForm:{},
+      yesOptions:[{label:"是",value:1},{label:"否",value:0}],
+      parentTypes:[],
+      parentTypesMap:{},
+      roleForm:{
+        name:undefined,
+        goodsNumber:undefined,
+        sellVolume:undefined,
+        isLimited:undefined,
+        isHot:undefined,
+        categoryId:undefined,
+        primaryProductId:undefined,
+        promotionDesc:undefined,
+        goodsUnit:undefined,
+        isNew:undefined,
+        extraPrice:undefined,
+        retailPrice:undefined,
+        isOnSale:undefined,
+        goodsBrief:undefined,
+        categoryIds:undefined
+      },
       roleModalVisible:false,
       submitLoading: false,
       columns: [
@@ -149,13 +173,103 @@ export default {
           title: "是否在售",
           key: "isOnSale",
           width: 110,
-          sortable: true
+          align: "center",
+          render: (h, params) => {
+            if (params.row.isOnSale==1) {
+              return h("div", [
+                h(
+                  "Button",
+                  {
+                    props: {
+                      type: "success",
+                      size: "small"
+                    },
+                    style: {
+                      marginRight: "5px"
+                    },
+                    on: {
+                      click: () => {
+                        this.offSale(params.row);
+                      }
+                    }
+                  },
+                  "下架"
+                )
+              ]);
+            } else {
+              return h("div", [
+                h(
+                  "Button",
+                  {
+                    props: {
+                      type: "info",
+                      size: "small"
+                    },
+                    style: {
+                      marginRight: "5px"
+                    },
+                    on: {
+                      click: () => {
+                        this.onSale(params.row);
+                      }
+                    }
+                  },
+                  "上架"
+                )
+              ]);
+            }
+          }
         },
         {
           title: "是否删除",
-          key: "isOnSale",
+          key: "isDelete",
           width: 110,
-          sortable: true
+          align: "center",
+          render: (h, params) => {
+            if (params.row.isDelete==0) {
+              return h("div", [
+                h(
+                  "Button",
+                  {
+                    props: {
+                      type: "success",
+                      size: "small"
+                    },
+                    style: {
+                      marginRight: "5px"
+                    },
+                    on: {
+                      click: () => {
+                        this.delete(params.row);
+                      }
+                    }
+                  },
+                  "设为无效"
+                )
+              ]);
+            } else {
+              return h("div", [
+                h(
+                  "Button",
+                  {
+                    props: {
+                      type: "info",
+                      size: "small"
+                    },
+                    style: {
+                      marginRight: "5px"
+                    },
+                    on: {
+                      click: () => {
+                        this.cancelDelete(params.row);
+                      }
+                    }
+                  },
+                  "设为有效"
+                )
+              ]);
+            }
+          }
         },
         {
           title: "零售价格",
@@ -164,7 +278,13 @@ export default {
           sortable: true
         },
         {
-          title: "销售库存",
+          title: "库存",
+          key: "goodsNumber",
+          width: 110,
+          sortable: true
+        },
+        {
+          title: "销售量",
           key: "sellVolume",
           width: 110,
           sortable: true
@@ -177,12 +297,47 @@ export default {
           sortType: "desc"
         },
         {
+          title: "创建时间",
+          key: "addTime",
+          sortable: true,
+          width: 105,
+          sortType: "desc"
+        },
+        {
+          title: "分类",
+          key: "categoryId",
+          sortable: true,
+          width: 105,
+          render:(h,params)=>{
+            return h('div',
+              this.parentTypesMap[params.row.categoryId]
+            );
+          }
+        },
+        {
           title: "操作",
           key: "action",
-          width: 98,
+          width: 300,
           align: "center",
           render: (h, params) => {
-            return h("div", [
+            return h("div", [h(
+              "Button",
+              {
+                props: {
+                  type: "primary",
+                  size: "small"
+                },
+                style: {
+                  marginRight: "5px"
+                },
+                on: {
+                  click: () => {
+                    this.edit(params.row);
+                  }
+                }
+              },
+              "编辑"
+            ),
               h(
                 "Button",
                 {
@@ -232,9 +387,26 @@ export default {
       };
       this.getRequest("/goods", params).then(res => {
         this.loading = false;
-        if (res.status === 200) {
+        if (res.status == 200) {
           this.data = res.data.records;
           this.total = res.data.total;
+        }
+      });
+      this.getRequest("/categorys", {current:1,size:1000,descs:"sortOrder",parentId:0}).then(res => {
+        if (res.status === 200) {
+          this.parentTypes=[];
+          this.parentTypesMap={}
+          res.data.records.forEach(item=>{
+            this.parentTypes.push({value:item.id,label:item.name,children: [], loading: false})
+          })
+        }
+      });
+      this.getRequest("/categorys", {current:1,size:1000,descs:"sortOrder"}).then(res => {
+        if (res.status === 200) {
+          this.parentTypesMap={}
+          res.data.records.forEach(item=>{
+            this.parentTypesMap[item.id]=item.name
+          })
         }
       });
     },
@@ -247,8 +419,8 @@ export default {
         title: "确认删除",
         content: "您确认要删除该条数据?",
         onOk: () => {
-          this.deleteRequest("/log/delByIds", { ids: v.id }).then(res => {
-            if (res.success === true) {
+          this.deleteRequest("/goods", { id: v.id }).then(res => {
+            if (res.status == 200) {
               this.$Message.success("删除成功");
               this.init();
             }
@@ -317,11 +489,10 @@ export default {
     },
     addGoods(){
         this.modalType = 0;
-        this.modalTitle = "添加角色";
-        this.roleForm = {
-          name: "",
-          access: null
-        };
+        this.modalTitle = "添加商品";
+        this.roleForm={};
+        this.primaryPicUrl=undefined
+        this.listPicUrl=undefined
         this.roleModalVisible = true;
     },
     cancelRole() {
@@ -330,15 +501,11 @@ export default {
     submitRole() {
       this.$refs.roleForm.validate(valid => {
         if (valid) {
-          let url = "/role/save";
-          if (this.modalType === 1) {
-            // 编辑用户
-            url = "/role/edit";
-          }
+          let url = "/goods";
           this.submitLoading = true;
-          this.postRequest(url, this.roleForm).then(res => {
+          this.postBodyRequest(url, this.roleForm).then(res => {
             this.submitLoading = false;
-          if (res.success === true) {
+          if (res.status == 200) {
             this.$Message.success("操作成功");
             this.init();
             this.roleModalVisible = false;
@@ -349,11 +516,10 @@ export default {
     },
     addRole() {
       this.modalType = 0;
-      this.modalTitle = "添加角色";
-      this.roleForm = {
-        name: "",
-        access: null
-      };
+      this.modalTitle = "添加商品";
+      this.$refs.roleForm.resetFields();
+      this.primaryPicUrl=undefined
+      this.listPicUrl=undefined
       this.roleModalVisible = true;
     },
     edit(v) {
@@ -368,6 +534,8 @@ export default {
       let str = JSON.stringify(v);
       let roleInfo = JSON.parse(str);
       this.roleForm = roleInfo;
+      this.primaryPicUrl=this.roleForm.primaryPicUrl
+      this.listPicUrl=this.roleForm.listPicUrl
       this.roleModalVisible = true;
     },
     remove(v) {
@@ -384,6 +552,88 @@ export default {
     }
     });
     },
+    load (item, callback) {
+      item.loading = true;
+      setTimeout(() => {
+        this.getRequest("/categorys", {current:1,size:1000,descs:"sortOrder",parentId:item.value}).then(res => {
+          if (res.status === 200) {
+            for(let j=0;j<res.data.records.length;j++){
+              item.children.push({value:res.data.records[j].id,label:res.data.records[j].name})
+            }
+            item.loading = false;
+            callback();
+          }
+        });
+      }, 1000);
+    },
+    offSale(v) {
+      this.$Modal.confirm({
+        title: "确认下架",
+        content: "您确认要下架商品 " + v.name + " ?",
+        onOk: () => {
+          this.postBodyRequest("/goods",{id:v.id,isOnSale:0}).then(res => {
+            if (res.status == 200) {
+              this.$Message.success("操作成功");
+              this.init();
+            }
+          });
+        }
+      });
+    },
+    onSale(v) {
+      this.$Modal.confirm({
+        title: "确认上架",
+        content: "您确认要上架商品 " + v.name + " ?",
+        onOk: () => {
+          this.postBodyRequest("/goods",{id:v.id,isOnSale:1}).then(res => {
+            if (res.status == 200) {
+              this.$Message.success("操作成功");
+              this.init();
+            }
+          });
+        }
+      });
+    },
+    delete(v) {
+      this.$Modal.confirm({
+        title: "确认删除",
+        content: "您确认删除商品 " + v.name + " ?",
+        onOk: () => {
+          this.postBodyRequest("/goods",{id:v.id,isDelete:1}).then(res => {
+            if (res.status == 200) {
+              this.$Message.success("操作成功");
+              this.init();
+            }
+          });
+        }
+      });
+    },
+    cancelDelete(v) {
+      this.$Modal.confirm({
+        title: "确认恢复",
+        content: "您确认要恢复商品 " + v.name + " ?",
+        onOk: () => {
+          this.postBodyRequest("/goods",{id:v.id,isDelete:0}).then(res => {
+            if (res.success === true) {
+              this.$Message.success("操作成功");
+              this.init();
+            }
+          });
+        }
+      });
+    },
+    formatType(labels, selectedData) {
+      console.log(selectedData)
+      const index = labels.length - 1;
+      const data = selectedData[index] || false;
+      if (data && data.code) {
+        return labels[index] + ' - ' + data.code;
+      }
+      if(selectedData.length>1){
+        this.roleForm.categoryId=selectedData[1].value
+      }
+      return labels[index];
+    }
   },
   mounted() {
     this.init();

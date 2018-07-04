@@ -50,7 +50,7 @@ export default {
       loading: true,
       treeLoading: true,
       submitPermLoading: false,
-      sortColumn: "createTime",
+      sortColumn: "gmtCreate",
       sortType: "desc",
       modalType: 0,
       roleModalVisible: false,
@@ -63,7 +63,6 @@ export default {
           birthday:"",
           tradeMoney:1
         }
-
       },
       editFormValidate: {
         name: [{ required: true, message: "角色名称不能为空", trigger: "blur" }]
@@ -78,6 +77,7 @@ export default {
       submitLoading: false,
       selectList: [],
       selectCount: 0,
+      isAscs:false,
       columns: [
         {
           type: "selection",
@@ -93,16 +93,7 @@ export default {
           title: "交易类别",
           key: "tradeType",
           sortable: true,
-          sortType: "desc",
-          render: (h, params) => {
-            let re = "";
-            if (params.row.tradeType === 'PURCHASE') {
-              re = "消费";
-            } else if (params.row.tradeType === 'CHARGE') {
-              re = "充值";
-            }
-            return h("div", re);
-          }
+          sortType: "desc"
         },
         {
           title: "手机号",
@@ -130,117 +121,12 @@ export default {
         },
         {
           title: "交易时间",
-          key: "registerTime",
+          key: "gmtCreate",
           sortable: true,
           render:(h,params)=>{
             return h('div',
               params.row.gmtCreate?
                 formatDate(new Date(params.row.gmtCreate)):"-");/*这里的this.row能够获取当前行的数据*/
-          }},
-        {
-          title: "操作",
-          key: "action",
-          sortable: false,
-          align: "center",
-          width: 300,
-          render:(h,params) => {
-            return ('div',[
-              h('Dropdown',{
-                on:{
-                  'on-click':(value)=>{
-                    this.edit(params.row,value);
-                  }
-                }
-              },[
-                h('div',{
-                  class:{
-                    member_operate_div: true
-                  }
-                },[h(
-                  "Button",
-                  {
-                    props: {
-                      type: "warning",
-                      size: "small"
-                    },
-                    style: {
-                      marginRight: "5px"
-                    }
-                  },["账户操作",
-                    h('Icon',{
-                      props:{
-                        type: 'arrow-down-b'
-                      }
-                    })]
-                )]),
-                // h('a',{},'下拉'),
-                h('DropdownMenu',{
-                  slot:'list'
-                },[
-                  h('DropdownItem',{
-                    props:{
-                      name: '充值'
-                    }
-                  },'充值'),
-                  h('DropdownItem',{
-                    props:{
-                      name: '消费'
-                    }
-                  },'消费'),
-                ])
-              ])
-            // ,              h(
-            //     "Button",
-            //     {
-            //       props: {
-            //         type: "warning",
-            //         size: "small"
-            //       },
-            //       style: {
-            //         marginRight: "5px"
-            //       },
-            //       on: {
-            //         click: () => {
-            //           this.editPerm(params.row);
-            //         }
-            //       }
-            //     },
-            //     "分配权限"
-            //   ),
-              // h(
-              //   "Button",
-              //   {
-              //     props: {
-              //       type: "primary",
-              //       size: "small"
-              //     },
-              //     style: {
-              //       marginRight: "5px"
-              //     },
-              //     on: {
-              //       click: () => {
-              //         this.edit(params.row);
-              //       }
-              //     }
-              //   },
-              //   "编辑"
-              // ),
-              // h(
-              //   "Button",
-              //   {
-              //     props: {
-              //       type: "error",
-              //       size: "small"
-              //     },
-              //     on: {
-              //       click: () => {
-              //         this.remove(params.row);
-              //       }
-              //     }
-              //   },
-              //   "删除"
-              // )
-            ])
           }},
       ],
       data: [],
@@ -259,27 +145,30 @@ export default {
     },
     changePage(v) {
       this.pageNumber = v;
-      this.getRoleList();
+      this.loadData();
     },
     changePageSize(v) {
       this.pageSize = v;
-      this.getRoleList();
+      this.loadData();
     },
     changeSort(e) {
-      this.sortColumn = e.key;
-      this.sortType = e.order;
-      if (e.order === "normal") {
-        this.sortType = "";
+      console.log(e)
+      if (e.order === "desc") {
+        this.sortColumn = e.key;
+        this.isAscs = false;
+      }else if(e.order ==="normal"){
+        this.sortColumn = "";
+        this.isAscs =false;
       }
-      this.getRoleList();
+      this.loadData();
     },
     loadData() {
       this.loading = true;
       let params = {
         current: this.pageNumber,
         size: this.pageSize,
-        asc: false,
-        descs:"gmtCreate"
+        asc: this.isAscs,
+        descs:this.sortColumn
       };
       this.getRequest("/trades", params).then(res => {
         console.log(res)

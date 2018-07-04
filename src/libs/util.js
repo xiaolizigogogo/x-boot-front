@@ -10,7 +10,7 @@ let util = {
 
 };
 util.title = function (title) {
-    title = title || 'X-Boot 前后端分离框架';
+    title = title || '后台管理';
     window.document.title = title;
 };
 
@@ -307,7 +307,7 @@ util.initRouterNode = function (routers, data) {
         let meta = {};
         // 给页面添加按钮权限和标题
         meta.buttonTypes = menu.buttonTypes ? menu.buttonTypes : null;
-        meta.title = menu.title ? menu.title + " - X-Boot前后端分离框架" : null;
+        meta.title = menu.title ? menu.title  : null;
         menu.meta = meta;
 
         routers.push(menu);

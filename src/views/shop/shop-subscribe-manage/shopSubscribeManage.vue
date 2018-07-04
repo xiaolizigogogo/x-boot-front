@@ -219,11 +219,11 @@ export default {
     },
     changePage(v) {
       this.pageNumber = v;
-      this.getRoleList();
+      this.loadData();
     },
     changePageSize(v) {
       this.pageSize = v;
-      this.getRoleList();
+      this.loadData();
     },
     changeSort(e) {
       this.sortColumn = e.key;
@@ -231,7 +231,7 @@ export default {
       if (e.order === "normal") {
         this.sortType = "";
       }
-      this.getRoleList();
+      this.loadData();
     },
     loadData() {
       this.loading = true;

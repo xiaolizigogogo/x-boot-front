@@ -129,6 +129,15 @@ export default {
           }
         },
         {
+          title: "余额",
+          key: "restMoney",
+          sortable: true,
+          render:(h,params)=>{
+            return h('div',
+              fmoney(params.row.restMoney,2));/*这里的this.row能够获取当前行的数据*/
+          }
+        },
+        {
           title: "关注状态",
           key: "subscribe",
           sortable: true,
@@ -382,9 +391,17 @@ export default {
           v[attr] = "";
         }
       }
-      this.editForm.nideshopTrade.memberName=v.username;
+      this.editForm.nideshopTrade.memberName=v.nickname;
       this.editForm.nideshopTrade.memberId=v.id;
-      this.editForm.nideshopTrade.tradeType=n;
+      this.editForm.nideshopTrade.openid=v.weixinOpenid
+      this.editForm.nideshopTrade.memberPhoneNumber=v.mobile;
+
+      if(n=="充值"){
+        this.editForm.nideshopTrade.tradeType="线下充值";
+      }
+      else{
+        this.editForm.nideshopTrade.tradeType="线下消费";
+      }
       this.editModalVisible = true;
     },
     remove(v) {
