@@ -6,9 +6,54 @@
         <Row>
             <Col>
                 <Card>
+                  <Row>
+                    <Form ref="searchForm" :model="searchForm" inline :label-width="70" class="search-form">
+                      <Form-item label="编号" prop="orderSn">
+                        <Input type="text" v-model="searchForm.orderSn" clearable placeholder="请输入编号" style="width: 200px"/>
+                      </Form-item>
+                      <Form-item label="客户" prop="userName">
+                        <Input type="text" v-model="searchForm.userName" clearable placeholder="请输入名称" style="width: 200px"/>
+                      </Form-item>
+                      <Form-item label="客户手机" prop="mobile">
+                        <Input type="text" v-model="searchForm.mobile" clearable placeholder="客户手机" style="width: 200px"/>
+                      </Form-item>
+                      <span v-if="drop">
+                              <Form-item label="支付状态" prop="subscribeStatus">
+                                <Select v-model="searchForm.payStatus" placeholder="支付状态" clearable style="width: 200px">
+                                  <Option value="">全部</Option>
+                                  <Option value=0>未支付</Option>
+                                  <Option value=1>已支付</Option>
+                                </Select>
+                              </Form-item>
+                               <Form-item label="物流状态" prop="subscribeStatus">
+                                <Select v-model="searchForm.orderStatus" placeholder="物流状态" clearable style="width: 200px">
+                                   <Option value="">全部</Option>
+                                  <Option value=0>未发货</Option>
+                                  <Option value=1>已发货</Option>
+                                </Select>
+                              </Form-item>
+                              <Form-item label="订单状态" prop="subscribeStatus">
+                                <Select v-model="searchForm.shippingStatus" placeholder="订单状态" clearable style="width: 200px">
+                                   <Option value="">全部</Option>
+                                  <Option value=0>待确认</Option>
+                                  <Option value=1>已确认</Option>
+                                   <Option value=2>已完成</Option>
+                                   <Option value=-1>已取消</Option>
+                                </Select>
+                              </Form-item>
+                            </span>
+                      <Form-item style="margin-left:-35px;">
+                        <Button @click="handleSearch" type="primary" icon="search">搜索</Button>
+                        <Button @click="handleReset" type="ghost" >重置</Button>
+                        <a class="drop-down" @click="dropDown">{{dropDownContent}}
+                          <Icon :type="dropDownIcon"></Icon>
+                        </a>
+                      </Form-item>
+                    </Form>
+                  </Row>
                     <Row class="operation">
-                        <Button @click="addRole" type="primary" icon="plus-round">添加角色</Button>
-                        <Button @click="delAll" type="ghost" icon="trash-a">批量删除</Button>
+                        <!--<Button @click="addRole" type="primary" icon="plus-round">添加角色</Button>-->
+                        <!--<Button @click="delAll" type="ghost" icon="trash-a">批量删除</Button>-->
                         <Button @click="init" type="ghost" icon="refresh">刷新</Button>
                     </Row>
                      <Row>
@@ -105,19 +150,40 @@ export default {
           }
         },
         {
+          title: "客户",
+          key: "userName",
+          align: "center",
+        },
+        {
+          title: "客户手机",
+          key: "mobile",
+          align: "center",
+        },
+        {
           title: "支付状态",
           key: "payStatus",
           align: "center",
+          render:(h,params)=>{
+            return h('div', this.payStatusMap[params.row.payStatus]);/*这里的this.row能够获取当前行的数据*/
+          }
         },
         {
           title: "订单状态",
           key: "orderStatus",
           align: "center",
+          render:(h,params)=>{
+            return h('div',
+              this.orderStatusMap[params.row.orderStatus]);/*这里的this.row能够获取当前行的数据*/
+          }
         },
         {
           title: "快递状态",
           key: "shippingStatus",
           align: "center",
+          render:(h,params)=>{
+            return h('div',
+              this.shippingStatus[params.row.shippingStatus]);/*这里的this.row能够获取当前行的数据*/
+          }
         },
         {
           title: "订单金额",
@@ -129,60 +195,70 @@ export default {
           key: "action",
           align: "center",
           width: 300,
-          render: (h, params) => {
-            return h("div", [
-              h(
-                "Button",
-                {
-                  props: {
-                    type: "warning",
-                    size: "small"
-                  },
-                  style: {
-                    marginRight: "5px"
-                  },
-                  on: {
-                    click: () => {
-                      this.editPerm(params.row);
-                    }
+          render:(h,params) => {
+            return ('div',[
+              h('Dropdown',{
+                on:{
+                  'on-click':(value)=>{
+                    this.editOrderStatus(params.row,value);
                   }
-                },
-                "分配权限"
-              ),
-              h(
-                "Button",
-                {
-                  props: {
-                    type: "primary",
-                    size: "small"
-                  },
-                  style: {
-                    marginRight: "5px"
-                  },
-                  on: {
-                    click: () => {
-                      this.edit(params.row);
-                    }
+                }
+              },[
+                h('div',{
+                  class:{
+                    member_operate_div: true
                   }
-                },
-                "编辑"
-              ),
-              h(
-                "Button",
-                {
-                  props: {
-                    type: "error",
-                    size: "small"
-                  },
-                  on: {
-                    click: () => {
-                      this.remove(params.row);
+                },[h(
+                  "Button",
+                  {
+                    props: {
+                      type: "warning",
+                      size: "small"
+                    },
+                    style: {
+                      marginRight: "5px"
                     }
-                  }
-                },
-                "删除"
-              )
-            ]);
+                  },["状态修改",
+                    h('Icon',{
+                      props:{
+                        type: 'arrow-down-b'
+                      }
+                    })]
+                )]),
+                h('DropdownMenu',{
+                  slot:'list'
+                },[
+                  h('DropdownItem',{
+                    props:{
+                      name: '确认订单',
+                      disabled:!(params.row.orderStatus==0),
+                      value:1,
+                    }
+                  },'确认订单'),
+                  h('DropdownItem',{
+                    props:{
+                      name: '确认发货',
+                      disabled:!(params.row.shippingStatus==0),
+                      value:2,
+                    }
+                  },'确认发货'),
+                  h('DropdownItem',{
+                    props:{
+                      name: '确认完成',
+                      disabled:!(params.row.orderStatus==1&&params.row.shippingStatus==1),
+                      value:2,
+                    }
+                  },'确认完成'),
+                  h('DropdownItem',{
+                    props:{
+                      name: '取消订单',
+                      disabled:!(params.row.subscribeStatus!=-1),
+                      value:-1
+                    }
+                  },'取消订单'),
+                ])
+              ])
+            ])
           }
         }
       ],
@@ -194,6 +270,35 @@ export default {
       editRolePermId: "",
       selectPermList: [],
       selectAllFlag: false,
+      drop: false,
+      dropDownContent: "展开",
+      dropDownIcon: "chevron-down",
+      searchForm: {
+        current: this.pageNumber,
+        size: this.pageSize,
+        asc: false,
+        descs:"addTime",
+        mobile:undefined,
+        userName:undefined,
+        orderSn:undefined,
+        shippingStatus:undefined,
+        payStatus:undefined,
+        orderStatus:undefined
+      },
+      orderStatusMap:{
+        "0":"待确认",
+        "1":"已确认",
+        "2":"已完成",
+        "-1":"已取消"
+      },
+      payStatusMap:{
+        "0":"未支付",
+        "1":"已支付",
+      },
+      shippingStatus:{
+        "0":"未发货",
+        "1":"已发货"
+      }
     };
   },
   methods: {
@@ -218,13 +323,7 @@ export default {
     },
     loadData() {
       this.loading = true;
-      let params = {
-        current: this.pageNumber,
-        size: this.pageSize,
-        asc: false,
-        descs:"addTime"
-      };
-      this.getRequest("/orders", params).then(res => {
+      this.getRequest("/orders", this.searchForm).then(res => {
         console.log(res)
         this.loading = false;
         if (res.status === 200) {
@@ -291,6 +390,40 @@ export default {
       let roleInfo = JSON.parse(str);
       this.roleForm = roleInfo;
       this.roleModalVisible = true;
+    },
+    editOrderStatus(v,n){
+      let params={
+            id:v.id
+      }
+      if(n=="确认发货"){
+        params.shippingStatus=1
+      }
+      else if(n=="确认订单"){
+        params.orderStatus=1
+      }
+      else if(n=="确认完成"){
+        params.orderStatus=2
+      }
+      else if(n=="取消订单"){
+        params.orderStatus=-1
+      }
+      this.$Modal.confirm({
+        title: n,
+        content: "您确认要"+n+ v.orderSn + " ?",
+        onOk: () => {
+          this.putBodyRequest("/orders",params).then(res=>{
+            if (res.status === 200) {
+              this.$Message.success("操作成功");
+              this.init();
+            }
+            else{
+              this.$Message.success("操作失败");
+              this.init();
+            }
+          })
+        }
+      });
+
     },
     remove(v) {
       this.$Modal.confirm({
@@ -445,7 +578,30 @@ export default {
     },
     cancelPermEdit() {
       this.permModalVisible = false;
-    }
+    },
+    //搜索相关函数
+    handleSearch() {
+      this.searchForm.pageNumber = 1;
+      this.searchForm.pageSize = 10;
+      this.init();
+    },
+    handleReset() {
+      this.$refs.searchForm.resetFields();
+      this.searchForm.pageNumber = 1;
+      this.searchForm.pageSize = 10;
+      // 重新加载数据
+      this.init();
+    },
+    dropDown() {
+      if (this.drop) {
+        this.dropDownContent = "展开";
+        this.dropDownIcon = "chevron-down";
+      } else {
+        this.dropDownContent = "收起";
+        this.dropDownIcon = "chevron-up";
+      }
+      this.drop = !this.drop;
+    },
   },
   mounted() {
     this.init();

@@ -6,6 +6,24 @@
         <Row>
             <Col>
                 <Card>
+
+                  <Row>
+                    <Form ref="searchForm" :model="searchForm" inline :label-width="70" class="search-form">
+                      <Form-item label="客户" prop="username">
+                        <Input type="text" v-model="searchForm.username" clearable placeholder="请输入名称" style="width: 200px"/>
+                      </Form-item>
+                      <Form-item label="客户手机" prop="mobile">
+                        <Input type="text" v-model="searchForm.mobile" clearable placeholder="客户手机" style="width: 200px"/>
+                      </Form-item>
+                      <Form-item style="margin-left:-35px;">
+                        <Button @click="handleSearch" type="primary" icon="search">搜索</Button>
+                        <Button @click="handleReset" type="ghost" >重置</Button>
+                        <a class="drop-down" @click="dropDown">{{dropDownContent}}
+                          <Icon :type="dropDownIcon"></Icon>
+                        </a>
+                      </Form-item>
+                    </Form>
+                  </Row>
                     <Row class="operation">
                         <Button @click="init" type="ghost" icon="refresh">刷新</Button>
                     </Row>
@@ -284,6 +302,17 @@ export default {
       editRolePermId: "",
       selectPermList: [],
       selectAllFlag: false,
+      drop: false,
+      dropDownContent: "展开",
+      dropDownIcon: "chevron-down",
+      searchForm: {
+        current: this.pageNumber,
+        size: this.pageSize,
+        asc: false,
+        descs:"registerTime",
+        username:undefined,
+        mobile:undefined,
+      },
     };
   },
   methods: {
@@ -308,13 +337,7 @@ export default {
     },
     loadData() {
       this.loading = true;
-      let params = {
-        current: this.pageNumber,
-        size: this.pageSize,
-        asc: false,
-        descs:"registerTime"
-      };
-      this.getRequest("/members", params).then(res => {
+      this.getRequest("/members", this.searchForm).then(res => {
         console.log(res)
         this.loading = false;
         if (res.status === 200) {
@@ -557,7 +580,30 @@ export default {
     },
     cancelPermEdit() {
       this.permModalVisible = false;
-    }
+    },
+    //搜索相关函数
+    handleSearch() {
+      this.searchForm.pageNumber = 1;
+      this.searchForm.pageSize = 10;
+      this.init();
+    },
+    handleReset() {
+      this.$refs.searchForm.resetFields();
+      this.searchForm.pageNumber = 1;
+      this.searchForm.pageSize = 10;
+      // 重新加载数据
+      this.init();
+    },
+    dropDown() {
+      if (this.drop) {
+        this.dropDownContent = "展开";
+        this.dropDownIcon = "chevron-down";
+      } else {
+        this.dropDownContent = "收起";
+        this.dropDownIcon = "chevron-up";
+      }
+      this.drop = !this.drop;
+    },
   },
   mounted() {
     this.init();

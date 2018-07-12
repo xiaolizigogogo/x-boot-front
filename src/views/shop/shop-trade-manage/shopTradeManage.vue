@@ -6,6 +6,38 @@
         <Row>
             <Col>
                 <Card>
+
+                  <Row>
+                    <Form ref="searchForm" :model="searchForm" inline :label-width="70" class="search-form">
+                      <Form-item label="交易编号" prop="cardNo">
+                      <Input type="text" v-model="searchForm.cardNo" clearable placeholder="请输入交易编号" style="width: 200px"/>
+                    </Form-item>
+                      <Form-item label="客户名" prop="memberName">
+                        <Input type="text" v-model="searchForm.memberName" clearable placeholder="请输入客户名" style="width: 200px"/>
+                      </Form-item>
+                      <Form-item label="客户手机" prop="phoneNumber">
+                        <Input type="text" v-model="searchForm.memberPhoneNumber" clearable placeholder="客户手机" style="width: 200px"/>
+                      </Form-item>
+                      <span v-if="drop">
+                              <Form-item label="交易类型" prop="tradeType">
+                                <Select v-model="searchForm.tradeType" placeholder="交易类型" clearable style="width: 200px">
+                                  <Option value="线下充值">线下充值</Option>
+                                  <Option value="线下消费">线下消费</Option>
+                                   <Option value="线上买单">线上买单</Option>
+                                   <Option value="订单支付">订单支付</Option>
+                                   <Option value="余额支付">余额支付</Option>
+                                </Select>
+                              </Form-item>
+                            </span>
+                      <Form-item style="margin-left:-35px;">
+                        <Button @click="handleSearch" type="primary" icon="search">搜索</Button>
+                        <Button @click="handleReset" type="ghost" >重置</Button>
+                        <a class="drop-down" @click="dropDown">{{dropDownContent}}
+                          <Icon :type="dropDownIcon"></Icon>
+                        </a>
+                      </Form-item>
+                    </Form>
+                  </Row>
                     <Row class="operation">
                         <Button @click="init" type="ghost" icon="refresh">刷新</Button>
                     </Row>
@@ -137,6 +169,19 @@ export default {
       editRolePermId: "",
       selectPermList: [],
       selectAllFlag: false,
+      drop: false,
+      dropDownContent: "展开",
+      dropDownIcon: "chevron-down",
+      searchForm: {
+        current: this.pageNumber,
+        size: this.pageSize,
+        asc: false,
+        descs:"gmtCreate",
+        memberName:undefined,
+        cardNo:undefined,
+        memberPhoneNumber:undefined,
+        tradeType:undefined
+      },
     };
   },
   methods: {
@@ -164,13 +209,7 @@ export default {
     },
     loadData() {
       this.loading = true;
-      let params = {
-        current: this.pageNumber,
-        size: this.pageSize,
-        asc: this.isAscs,
-        descs:this.sortColumn
-      };
-      this.getRequest("/trades", params).then(res => {
+      this.getRequest("/trades", this.searchForm).then(res => {
         console.log(res)
         this.loading = false;
         if (res.status === 200) {
@@ -405,7 +444,30 @@ export default {
     },
     cancelPermEdit() {
       this.permModalVisible = false;
-    }
+    },
+    //搜索相关函数
+    handleSearch() {
+      this.searchForm.pageNumber = 1;
+      this.searchForm.pageSize = 10;
+      this.init();
+    },
+    handleReset() {
+      this.$refs.searchForm.resetFields();
+      this.searchForm.pageNumber = 1;
+      this.searchForm.pageSize = 10;
+      // 重新加载数据
+      this.init();
+    },
+    dropDown() {
+      if (this.drop) {
+        this.dropDownContent = "展开";
+        this.dropDownIcon = "chevron-down";
+      } else {
+        this.dropDownContent = "收起";
+        this.dropDownIcon = "chevron-up";
+      }
+      this.drop = !this.drop;
+    },
   },
   mounted() {
     this.init();
