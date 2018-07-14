@@ -133,6 +133,7 @@ export default {
       parentTypes:[],
       parentTypesMap:{},
       roleForm:{
+        id:1,
         name:undefined,
         goodsNumber:undefined,
         sellVolume:undefined,
