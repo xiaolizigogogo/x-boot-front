@@ -73,8 +73,11 @@
         </Row>
         <Modal :title="modalTitle" v-model="roleModalVisible" :mask-closable='false' :width="500">
           <Form ref="roleForm" :model="roleForm" :label-width="80" :rules="roleFormValidate">
-            <FormItem label="角色名称" prop="name">
-              <Input v-model="roleForm.name" placeholder="按照Spring Security约定建议以‘ROLE_’开头"/>
+            <FormItem label="快递公司" prop="name">
+              <Input v-model="roleForm.shipperName" placeholder="按照Spring Security约定建议以‘ROLE_’开头"/>
+            </FormItem>
+            <FormItem label="快递单号" prop="name">
+              <Input v-model="roleForm.logisticCode" placeholder="按照Spring Security约定建议以‘ROLE_’开头"/>
             </FormItem>
           </Form>
           <div slot="footer">
@@ -110,7 +113,14 @@ export default {
       permModalVisible: false,
       modalTitle: "",
       roleForm: {
-        name: ""
+        shipperName: "",
+        logisticCode:"",
+        orderId:"",
+        shipperCode:"-",
+        traces:"-",
+        isFinish:0,
+        requestCount:0,
+
       },
       roleFormValidate: {
         name: [{ required: true, message: "角色名称不能为空", trigger: "blur" }]
@@ -246,7 +256,7 @@ export default {
                     props:{
                       name: '确认完成',
                       disabled:!(params.row.orderStatus==1&&params.row.shippingStatus==1),
-                      value:2,
+                      value:3,
                     }
                   },'确认完成'),
                   h('DropdownItem',{
@@ -351,13 +361,8 @@ export default {
     submitRole() {
       this.$refs.roleForm.validate(valid => {
         if (valid) {
-          let url = "/role/save";
-          if (this.modalType === 1) {
-            // 编辑用户
-            url = "/role/edit";
-          }
           this.submitLoading = true;
-          this.postRequest(url, this.roleForm).then(res => {
+          this.putBodyRequest("/orders/ship", this.roleForm).then(res => {
             this.submitLoading = false;
             if (res.success === true) {
               this.$Message.success("操作成功");
@@ -391,12 +396,18 @@ export default {
       this.roleForm = roleInfo;
       this.roleModalVisible = true;
     },
+
     editOrderStatus(v,n){
       let params={
             id:v.id
       }
       if(n=="确认发货"){
+        this.modalType = 1;
+        this.modalTitle='确认发货';
+        this.roleModalVisible=true;
+        this.roleForm.orderId=v.id
         params.shippingStatus=1
+        return
       }
       else if(n=="确认订单"){
         params.orderStatus=1

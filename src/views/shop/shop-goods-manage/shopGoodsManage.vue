@@ -78,9 +78,6 @@
               @handleSuccess = "(url) => this.roleForm.primaryPicUrl = url" :imgUrl="this.primaryPicUrl">
             </qiniu>
           </FormItem>
-          <FormItem label="详情主产品" prop="name">
-            <Input v-model="roleForm.primaryProductId" placeholder="详情主产品"/>
-          </FormItem>
           <FormItem label="所属分类" prop="name">
             <Cascader :data="parentTypes"  :load-data="load" v-model="roleForm.categoryIds" placeholder="请选择" :render-format="formatType"></Cascader>
           </FormItem>
@@ -140,7 +137,7 @@ export default {
         isLimited:undefined,
         isHot:undefined,
         categoryId:undefined,
-        primaryProductId:undefined,
+        primaryProductId:1,
         promotionDesc:undefined,
         goodsUnit:undefined,
         isNew:undefined,
@@ -160,7 +157,7 @@ export default {
         },
         {
           title: "商品编号",
-          key: "goodsSn",
+          key: "id",
           width: 110,
           sortable: true
         },
