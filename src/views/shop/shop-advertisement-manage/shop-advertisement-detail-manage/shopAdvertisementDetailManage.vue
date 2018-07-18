@@ -270,13 +270,8 @@ export default {
     submitRole() {
       this.$refs.roleForm.validate(valid => {
         if (valid) {
-          let url = "/role/save";
-          if (this.modalType === 1) {
-            // 编辑用户
-            url = "/role/edit";
-          }
           this.submitLoading = true;
-          this.postRequest(url, this.roleForm).then(res => {
+          this.postBodyRequest("/adPositions/ad", this.roleForm).then(res => {
             this.submitLoading = false;
             if (res.success === true) {
               this.$Message.success("操作成功");
@@ -299,7 +294,7 @@ export default {
     },
     edit(v) {
       this.modalType = 1;
-      this.modalTitle = "编辑角色";
+      this.modalTitle = "编辑广告";
       // 转换null为""
       for (let attr in v) {
         if (v[attr] === null) {
