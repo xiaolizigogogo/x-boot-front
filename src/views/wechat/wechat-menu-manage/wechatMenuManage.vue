@@ -42,35 +42,18 @@
                  <FormItem label="名称" prop="title">
                   <Input v-model="menuForm.title"/>
                 </FormItem>
-                <FormItem label="路径" prop="path">
-                  <Input v-model="menuForm.path"/>
+                <FormItem label="路径" prop="url">
+                  <Input v-model="menuForm.url"/>
                 </FormItem>
                 <FormItem label="按钮权限类型" prop="buttonType" v-if="menuForm.type===1">
                   <Select v-model="menuForm.buttonType" placeholder="请选择">
-                    <Option value="add">添加操作</Option>
-                    <Option value="edit">编辑操作</Option>
-                    <Option value="delete">删除操作</Option>
-                    <Option value="clearAll">清空全部</Option>
-                    <Option value="enable">启用操作</Option>
-                    <Option value="disable">禁用操作</Option>
-                    <Option value="search">搜索操作</Option>
-                    <Option value="output">导出操作</Option>
-                    <Option value="editPerm">分配权限</Option>
-                    <Option value="setDefault">设为默认</Option>
+                    <Option value="view">网页</Option>
+                    <Option value="click">点击</Option>
                   </Select>
                 </FormItem>
                 <div v-if="menuForm.type===0">
                   <FormItem label="英文名" prop="name">
                     <Input v-model="menuForm.name"/>
-                  </FormItem>
-                  <FormItem label="图标" prop="icon" style="margin-bottom: 5px;">
-                    <Input v-model="menuForm.icon"/>
-                    <span>
-                      图标请参考 <a target="_blank" href="http://ionicons.com/"><Icon type="ionic"></Icon> ionicons</a>
-                    </span>
-                  </FormItem>
-                  <FormItem label="前端组件" prop="component">
-                    <Input v-model="menuForm.component"/>
                   </FormItem>
                 </div>
                 <FormItem label="排序值" prop="sortOrder">
@@ -114,37 +97,15 @@
             <FormItem label="名称" prop="title">
               <Input v-model="menuFormAdd.title"/>
             </FormItem>
-            <FormItem label="路径" prop="path">
-              <Input v-model="menuFormAdd.path"/>
+            <FormItem label="路径" prop="url">
+              <Input v-model="menuFormAdd.url"/>
             </FormItem>
-            <FormItem label="按钮权限类型" prop="buttonType" v-if="menuFormAdd.type===1">
+            <FormItem label="按钮权限类型" prop="type" v-if="menuFormAdd.type===1">
               <Select v-model="menuFormAdd.buttonType" placeholder="请选择">
-                <Option value="add">添加操作</Option>
-                <Option value="edit">编辑操作</Option>
-                <Option value="delete">删除操作</Option>
-                <Option value="clearAll">清空全部</Option>
-                <Option value="enable">启用操作</Option>
-                <Option value="disable">禁用操作</Option>
-                <Option value="search">搜索操作</Option>
-                <Option value="output">导出操作</Option>
-                <Option value="editPerm">分配权限</Option>
-                <Option value="setDefault">设为默认</Option>
+                <Option value="view">网页</Option>
+                <Option value="click">点击</Option>
               </Select>
             </FormItem>
-            <div v-if="menuFormAdd.type===0">
-              <FormItem label="英文名" prop="name">
-                <Input v-model="menuFormAdd.name"/>
-              </FormItem>
-              <FormItem label="图标" prop="icon"  style="margin-bottom: 5px;">
-                <Input v-model="menuFormAdd.icon"/>
-                <span>
-                  图标请参考 <a target="_blank" href="http://ionicons.com/"><Icon type="ionic"></Icon> ionicons</a>
-                </span>
-              </FormItem>
-              <FormItem label="前端组件" prop="component">
-                <Input v-model="menuFormAdd.component"/>
-              </FormItem>
-            </div>
             <FormItem label="排序值" prop="sortOrder">
               <InputNumber :max="1000" :min="0" v-model="menuFormAdd.sortOrder"></InputNumber>
               <span style="margin-left:5px">值越小越靠前，支持小数</span>
@@ -230,8 +191,8 @@ export default {
           if (!this.expandAll) {
             res.result.forEach(function(e) {
 
-              if (e.children && e.children.length > 0) {
-                e.children.forEach(function(c) {
+              if (e.subButtons && e.subButtons.length > 0) {
+                e.subButtons.forEach(function(c) {
                   if (c.level === 2) {
                     c.expand = false;
                   }
@@ -252,10 +213,13 @@ export default {
           res.menu.buttons.forEach(function(e) {
             e.title=e.name
             e.expand=true
-            if (e.subButtons && e.subButtons.length > 0) {
-              e.subButtons.forEach(function(c) {
+            e.path=e.url
+            e.children=e.subButtons
+            if (e.children && e.children.length > 0) {
+              e.children.forEach(function(c) {
+                c.path=c.url
                 c.title=c.name
-                c.expand = true;
+                c.expand = false;
               });
             }
           });
@@ -354,6 +318,22 @@ export default {
             this.menuForm.icon = "";
             this.menuForm.component = "";
           }
+
+          this.data.menu.buttons.forEach(function(e) {
+            e.title=e.name
+            e.expand=true
+            e.path=e.url
+            e.children=e.subButtons
+            if (e.children && e.children.length > 0) {
+              e.children.forEach(function(c) {
+                c.path=c.url
+                c.title=c.name
+                c.expand = false;
+              });
+            }
+          });
+          // this.data.
+          //构造整个json传给后台
           this.postRequest("/permission/add", this.menuFormAdd).then(res => {
             this.submitLoading = false;
             if (res.success === true) {
@@ -366,7 +346,7 @@ export default {
       });
     },
     addMenu() {
-      if (this.menuForm.id == "" || this.menuForm.id == null) {
+      if (this.menuForm.name == "" || this.menuForm.name == null) {
         this.$Message.warning("请先点击选择一个菜单权限节点");
         return;
       }
