@@ -271,12 +271,16 @@ export default {
       this.$refs.roleForm.validate(valid => {
         if (valid) {
           this.submitLoading = true;
+          this.roleForm.adPositionId=this.$route.query.id
           this.postBodyRequest("/adPositions/ad", this.roleForm).then(res => {
             this.submitLoading = false;
-            if (res.success === true) {
+            if (res.status === 200) {
               this.$Message.success("操作成功");
               this.init();
               this.roleModalVisible = false;
+            }
+            else{
+              this.$Message.success("操作失败");
             }
           });
         }
