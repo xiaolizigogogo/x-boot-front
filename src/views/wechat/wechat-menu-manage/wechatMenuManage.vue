@@ -217,6 +217,7 @@ export default {
             e.children=e.subButtons
             if (e.children && e.children.length > 0) {
               e.children.forEach(function(c) {
+                c.parentName=e.name
                 c.path=c.url
                 c.title=c.name
                 c.expand = false;
@@ -318,30 +319,37 @@ export default {
             this.menuForm.icon = "";
             this.menuForm.component = "";
           }
-
-          this.data.menu.buttons.forEach(function(e) {
-            e.title=e.name
-            e.expand=true
-            e.path=e.url
-            e.children=e.subButtons
-            if (e.children && e.children.length > 0) {
-              e.children.forEach(function(c) {
-                c.path=c.url
-                c.title=c.name
-                c.expand = false;
-              });
+          /**
+           * 循环菜单找出要添加的子菜单
+           */
+          for(let i=0;i<this.data.length;i++){
+            let e=this.data[i];
+            if(this.menuForm.title==e.name){
+              this.menuFormAdd.name=this.menuFormAdd.title
+              e.subButtons.push( this.menuFormAdd);
             }
-          });
+
+            for(let j=0;j<e.subButtons.length;j++){
+              let c=e.subButtons[j];
+              if(this.menuForm.title==c.name){
+                this.menuFormAdd.name=this.menuFormAdd.title
+                c.subButtons.push( this.menuFormAdd);
+              }
+            }
+          }
+          console.log(this.data)
+          this.menuModalVisible = false;
+
           // this.data.
           //构造整个json传给后台
-          this.postRequest("/permission/add", this.menuFormAdd).then(res => {
-            this.submitLoading = false;
-            if (res.success === true) {
-              this.$Message.success("添加成功");
-              this.init();
-              this.menuModalVisible = false;
-            }
-          });
+          // this.postRequest("/permission/add", this.menuFormAdd).then(res => {
+          //   this.submitLoading = false;
+          //   if (res.success === true) {
+          //     this.$Message.success("添加成功");
+          //     this.init();
+          //     this.menuModalVisible = false;
+          //   }
+          // });
         }
       });
     },
