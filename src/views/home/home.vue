@@ -42,20 +42,20 @@
                                 <a href="https://github.com/Exrick/x-boot" target="_blank"> Github地址</a>
                             </p>
                             <div class="to-do-list-con">
-                                <Timeline>
-                                    <TimelineItem color="green">
-                                        <a href="https://www.bilibili.com/video/av23121122/" target="_blank">作者亲自制作宣传视频</a>
-                                    </TimelineItem>
-                                    <TimelineItem color="green">
-                                        <a href="http://xmall.exrick.cn" target="_blank">XMall开源商城</a>
-                                    </TimelineItem>
-                                    <TimelineItem color="red">
-                                        <a href="http://xpay.exrick.cn" target="_blank">XPay个人收款支付系统</a>
-                                    </TimelineItem>
-                                    <TimelineItem color="blue">
-                                        Star或捐赠后可加入QQ交流群 475743731
-                                    </TimelineItem>
-                                </Timeline>
+                                <!--<Timeline>-->
+                                    <!--<TimelineItem color="green">-->
+                                        <!--<a href="https://www.bilibili.com/video/av23121122/" target="_blank">作者亲自制作宣传视频</a>-->
+                                    <!--</TimelineItem>-->
+                                    <!--<TimelineItem color="green">-->
+                                        <!--<a href="http://xmall.exrick.cn" target="_blank">XMall开源商城</a>-->
+                                    <!--</TimelineItem>-->
+                                    <!--<TimelineItem color="red">-->
+                                        <!--<a href="http://xpay.exrick.cn" target="_blank">XPay个人收款支付系统</a>-->
+                                    <!--</TimelineItem>-->
+                                    <!--<TimelineItem color="blue">-->
+                                        <!--Star或捐赠后可加入QQ交流群 475743731-->
+                                    <!--</TimelineItem>-->
+                                <!--</Timeline>-->
                             </div>
                         </Card>
                     </Col>
@@ -192,7 +192,7 @@ export default {
     userFlow,
     countUp,
     inforCard,
-    mapDataTable
+    mapDataTable,
   },
   data() {
     return {

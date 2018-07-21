@@ -87,12 +87,32 @@
                 <FormItem label="密码" prop="password" v-if="modalType===0" :error="errorPass">
                     <Input type="password" v-model="userForm.password"/>
                 </FormItem>
+              <FormItem label="昵称" prop="nickName">
+                <Input v-model="userForm.nickName"/>
+              </FormItem>
+              <FormItem label="头像" prop="avatar">
+                <qiniu
+                  @handleSuccess = "(url) => this.userForm.avatar = url" :imgUrl="this.userForm.avatar">
+                </qiniu>
+              </FormItem>
+              <FormItem label="职称" prop="productNames">
+                <Input v-model="userForm.productNames"/>
+              </FormItem>
                 <FormItem label="邮箱" prop="email">
                     <Input v-model="userForm.email"/>
                 </FormItem>
                 <FormItem label="手机号" prop="mobile">
                     <Input v-model="userForm.mobile"/>
                 </FormItem>
+              <FormItem label="好评率" prop="commenPercent">
+                <Input v-model="userForm.commentPercent"/>
+              </FormItem>
+              <FormItem label="预约次数" prop="subscribeTimes">
+                <Input v-model="userForm.subscribeTimes"/>
+              </FormItem>
+              <FormItem label="产品数" prop="productCounts">
+                <Input v-model="userForm.productCounts"/>
+              </FormItem>
                 <FormItem label="性别" prop="sex">
                   <RadioGroup v-model="userForm.sex">
                     <Radio :label="1">男</Radio>
@@ -120,8 +140,12 @@
 </template>
 
 <script>
+  import qiniu from '../../my-components/image-upload/qiniu'
 export default {
   name: "user-manage",
+  components: {
+    qiniu
+  },
   data() {
     const validatePassword = (rule, value, callback) => {
       if (value.length < 6) {
@@ -192,6 +216,12 @@ export default {
         {
           title: "用户名",
           key: "username",
+          width: 150,
+          sortable: true
+        },
+        {
+          title: "昵称",
+          key: "nickName",
           width: 150,
           sortable: true
         },
