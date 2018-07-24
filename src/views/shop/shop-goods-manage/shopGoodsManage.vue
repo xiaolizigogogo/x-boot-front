@@ -97,6 +97,9 @@
           <FormItem label="库存量" prop="name">
             <Input v-model="roleForm.goodsNumber" placeholder="库存量"/>
           </FormItem>
+          <FormItem>
+            <texteditor :id="roleForm.id"></texteditor>
+          </FormItem>
         </Form>
         <div slot="footer">
           <Button type="text" @click="cancelRole">取消</Button>
@@ -109,10 +112,15 @@
 <script>
   import qiniu from '../../my-components/image-upload/qiniu'
   import {formatDate,fmoney} from '../../../utils/global'
+  import FormItem from "iview/src/components/form/form-item";
+  import texteditor from "../../my-components/text-editor/text-editor"
 export default {
   name: "shop-goods-manage",
   components:{
-    qiniu
+    FormItem,
+    qiniu,
+    texteditor
+
   },
   data() {
     return {
@@ -145,7 +153,7 @@ export default {
         retailPrice:undefined,
         isOnSale:undefined,
         goodsBrief:undefined,
-        categoryIds:undefined
+        categoryIds:undefined,
       },
       roleModalVisible:false,
       submitLoading: false,
@@ -541,6 +549,7 @@ export default {
         if (valid) {
           let url = "/goods";
           this.submitLoading = true;
+          this.roleForm.goodsDesc=localStorage.editorContent
           this.postBodyRequest(url, this.roleForm).then(res => {
             this.submitLoading = false;
           if (res.status == 200) {
@@ -562,7 +571,7 @@ export default {
     },
     edit(v) {
       this.modalType = 1;
-      this.modalTitle = "编辑角色";
+      this.modalTitle = "商品";
       // 转换null为""
       for (let attr in v) {
         if (v[attr] === null) {
@@ -574,6 +583,7 @@ export default {
       this.roleForm = roleInfo;
       this.primaryPicUrl=this.roleForm.primaryPicUrl
       this.listPicUrl=this.roleForm.listPicUrl
+      localStorage.editorContent=this.roleForm.goodsDesc
       this.roleModalVisible = true;
     },
     remove(v) {

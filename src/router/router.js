@@ -89,7 +89,14 @@ export const otherRouter = {
         name: 'shop-goods-gallery-detail-manage',
         title: '商品图片详情',
         component: () => import('@/views/shop/shop-goods-manage/shop-goods-gallery-manage/shopGoodsGalleryDetailManage.vue')
-      }
+      },
+{
+  path: 'text-editor',
+    icon: 'compose',
+  name: 'text-editor',
+  title: '富文本编辑器',
+  component: () => import('@/views/my-components/text-editor/text-editor.vue')
+},
     ]
 };
 
