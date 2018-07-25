@@ -1,7 +1,7 @@
 {
-  "name": "x-boot",
+  "name": "sikalai",
   "version": "1.0.0",
-  "description": "x-boot前后端分离框架",
+  "description": "sikalai斯卡莱后台管理",
   "author": "Exrick <1012139570@qq.com>",
   "private": true,
   "scripts": {

@@ -2,8 +2,8 @@
     <Row type="flex" justify="center" align="middle" class="regist" @keydown.enter="submitRegist">
         <Col :xs="{span:22}" style="width: 368px;">
             <Row class="header">
-                <img src="../images/xboot.png" width="220px"/>
-                <div class="description">X-Boot 是很不错的Web前后端分离架构脚手架</div>
+                <img src="../images/logo.png" width="220px"/>
+                <div class="description"></div>
             </Row>
 
             <Alert type="error" show-icon v-if="error">{{errorMsg}}</Alert>
@@ -50,7 +50,7 @@
                         </Row>
                     </FormItem>
                 </Form>
-            
+
                 <Row type="flex" justify="space-between" class="code-row-bg">
                     <Button class="regist-btn" type="primary" size="large" :loading="loading" @click="submitRegist">
                         <span v-if="!loading">注册</span>

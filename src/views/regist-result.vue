@@ -2,8 +2,8 @@
     <Row type="flex" justify="center" align="middle" class="regist" @keydown.enter="submitRegist">
         <Col :xs="{span:22}" style="width: 368px;">
             <Row class="header">
-                <img src="../images/xboot.png" width="220px"/>
-                <div class="description">X-Boot 是很不错的Web前后端分离架构脚手架</div>
+                <img src="../images/logo.png" width="220px"/>
+                <div class="description"></div>
             </Row>
 
             <Row class="success">
@@ -22,7 +22,7 @@
                     <a class="item">条款</a>
                 </Row>
                 <Row type="flex" justify="center" class="code-row-bg copyright">
-                    Copyright © 2018 <a href="http://exrick.cn" target="_blank" style="margin:0 5px;">Exrick</a> Presents
+                    Copyright © 2018 <a href="#" target="_blank" style="margin:0 5px;">斯卡莱</a> Presents
                 </Row>
             </Row>
         </Col>
