@@ -342,14 +342,14 @@ export default {
 
           // this.data.
           //构造整个json传给后台
-          // this.postRequest("/permission/add", this.menuFormAdd).then(res => {
-          //   this.submitLoading = false;
-          //   if (res.success === true) {
-          //     this.$Message.success("添加成功");
-          //     this.init();
-          //     this.menuModalVisible = false;
-          //   }
-          // });
+          this.postBodyRequest("/wechat/menu/create", {buttons:this.data}).then(res => {
+            this.submitLoading = false;
+            if (res.success === true) {
+              this.$Message.success("添加成功");
+              this.init();
+              this.menuModalVisible = false;
+            }
+          });
         }
       });
     },
