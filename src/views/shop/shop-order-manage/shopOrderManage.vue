@@ -207,6 +207,21 @@ export default {
           width: 300,
           render:(h,params) => {
             return ('div',[
+                        h(
+                "Button",
+                {
+                  props: {
+                    type: "primary",
+                    size: "small"
+                  },
+                  on: {
+                    click: () => {
+                      this.orderInfo(params.row);
+                    }
+                  }
+                },
+                "查看"
+              ),
               h('Dropdown',{
                 on:{
                   'on-click':(value)=>{
@@ -613,6 +628,10 @@ export default {
       }
       this.drop = !this.drop;
     },
+    orderInfo(i){
+      this.$router.push({path:"/shopping",query:{orderId:i.id}});
+    }
+
   },
   mounted() {
     this.init();
