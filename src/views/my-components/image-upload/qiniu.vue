@@ -13,7 +13,6 @@
       </template>
     </div>
     <Upload
-      ref="upload"
       :show-upload-list="false"
       :default-file-list="defaultList"
       :on-success="handleSuccess"
@@ -82,7 +81,7 @@
         this.visible = true;
       },
       handleRemove(file) {
-        this.$refs.upload.fileList.splice(file,1);
+        this.fileList.splice(file,1);
         this.defaultList.splice(file,1);
         this.uploadList.splice(file,1);
       },
@@ -90,7 +89,7 @@
         file.url = res.result;
         file.name = res.result;
         this.defaultList.push(file)
-        this.$refs.upload.fileList.push(file)
+        this.fileList.push(file)
         this.uploadList.push(file)
         // this.imgUrl=file.url
         this.$emit('handleSuccess', res.result);//传递给父组件
@@ -122,20 +121,19 @@
     },
     mounted() {
       this.getToken();
-      this.uploadList = this.$refs.upload.fileList;
+      this.uploadList = this.fileList;
     },
-    watch:{
-      imgUrl:function(var1,oldVar){
+    watch: {
+      imgUrl: function (var1, oldVar) {
         console.log(var1)
-        this.$refs.upload.fileList=[];
-        this.defaultList=[]
-        this.uploadList=[]
-        if(var1!=undefined){
-          this.$refs.upload.fileList.push({url:var1,status:"finished",name:var1})
-          this.defaultList.push({url:var1,status:"finished",name:var1})
-          this.uploadList.push({url:var1,status:"finished",name:var1})
+        this.fileList = [];
+        this.defaultList = []
+        this.uploadList = []
+        if (var1 != undefined) {
+          this.fileList.push({url: var1, status: "finished", name: var1})
+          this.defaultList.push({url: var1, status: "finished", name: var1})
+          this.uploadList.push({url: var1, status: "finished", name: var1})
         }
-
       }
     }
   };

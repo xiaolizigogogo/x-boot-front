@@ -72,11 +72,18 @@ export const otherRouter = {
         { path: 'ownspace', title: '个人中心', name: 'ownspace_index', component: () => import('@/views/own-space/own-space.vue') },
         { path: 'change-pass', title: '修改密码', name: 'change_pass', component: () => import('@/views/change-pass/change-pass.vue') },
         { path: 'message', title: '消息中心', name: 'message_index', component: () => import('@/views/message/message.vue') },
+       { path: 'shopping', title: '购物详情', name: 'shopping', component: () => import('@/views/advanced-router/component/shopping-info.vue') },
         {
         path: '/shop/shop-advertisement-manage/shop-advertisement-detail-manage',
         name: 'shop-advertisement-detail-manage',
         title: '广告详情',
         component: () => import('@/views/shop/shop-advertisement-manage/shop-advertisement-detail-manage/shopAdvertisementDetailManage.vue')
+      },
+      {
+        path: '/shop/shop-homecolumn-manage/shop-homecolumn-detail-manage',
+        name: 'shop-homecolumn-detail-manage',
+        title: '栏目详情',
+        component: () => import('@/views/shop/shop-homecolumn-manage/shop-homecolumn-detail-manage/shopHomeColumnDetailManage.vue')
       },
       {
         path: '/shop/shop-goods-manage/shop-goods-attribute-detail-manage',
