@@ -30,7 +30,7 @@
         <Icon type="camera" size="20"></Icon>
       </div>
     </Upload>
-    <Modal title="图片预览" v-model="visible">
+    <Modal title="图片预览" v-model="visible" :transfer="false">
       <img :src="imgName" v-if="visible" style="width: 100%">
     </Modal>
   </div>

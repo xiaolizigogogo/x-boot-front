@@ -35,7 +35,7 @@
                 </Card>
             </Col>
         </Row>
-      <Modal :title="modalTitle" v-model="roleModalVisible" :mask-closable='false' :width="500">
+      <Modal :title="modalTitle" v-model="roleModalVisible" :mask-closable='false' :width="1000" :transfer="false">
         <Form ref="roleForm" :model="roleForm" :label-width="80" :rules="roleFormValidate">
           <FormItem label="商品名称" prop="name">
             <Input v-model="roleForm.name" placeholder="商品名称"/>
