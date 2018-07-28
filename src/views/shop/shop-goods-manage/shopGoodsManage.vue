@@ -98,7 +98,7 @@
             <Input v-model="roleForm.goodsNumber" placeholder="库存量"/>
           </FormItem>
           <FormItem>
-            <texteditor :id="roleForm.id"></texteditor>
+            <texteditor :id="roleForm.id+' '"></texteditor>
           </FormItem>
         </Form>
         <div slot="footer">
@@ -136,7 +136,7 @@ export default {
       roleFormValidate:{
         name: [{ required: true, message: "商品名称不能为空", trigger: "blur" }],
         goodsBrief: [{ required: true, message: "不能为空", trigger: "blur" }],
-        retailPrice: [{ required: true, message: "不能为空", trigger: "blur" }],
+        retailPrice: [{ required: true, message: "不能为空", trigger: "blur" ,type:'number'}],
         primaryPicUrl: [{ required: true, message: "不能为空", trigger: "blur" }],
         listPicUrl: [{ required: true, message: "不能为空", trigger: "blur" }],
         goodsUnit: [{ required: true, message: "不能为空", trigger: "blur" }],
