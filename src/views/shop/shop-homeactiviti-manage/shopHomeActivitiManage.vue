@@ -483,7 +483,7 @@ export default {
         title: "确认删除",
         content: "您确认要删除 " + v.name + " ?",
         onOk: () => {
-          this.deleteRequest("/homeActivitis", { id: v.id }).then(res => {
+          this.deleteRequest("/homeActivitis/"+v.id, { id: v.id }).then(res => {
             if (res.status == 200) {
               this.$Message.success("删除成功");
               this.init();
