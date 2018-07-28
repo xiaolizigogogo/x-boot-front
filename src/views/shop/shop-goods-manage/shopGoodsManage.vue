@@ -316,6 +316,32 @@ export default {
           width: 105,
           sortType: "desc"
         },
+    {
+      title: "图片链接",
+        key: "primaryPicUrl",
+      align: "center",
+      width: 105,
+      render: (h, params) => {
+      return h('div', {
+        attrs: {
+          style: 'width: 80px;height: 80px;'
+        },
+      }, [
+        h('img', {
+          props: {
+            type: 'primary',
+            size: 'small'
+          },
+          attrs: {
+            src: params.row.primaryPicUrl, style: 'width: 80px;height: 80px;border-radius: 2px;'
+          },
+          style: {
+          },
+        }),
+      ]);
+    }
+
+    },
         {
           title: "分类",
           key: "categoryId",
