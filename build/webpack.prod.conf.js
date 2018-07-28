@@ -125,11 +125,11 @@ const webpackConfig = merge(baseWebpackConfig, {
       },
       {
         from: 'src/views/main-components/theme-switch/theme',
-        to: config.dev.assetsSubDirectory,
+        to: config.dev.assetsSubDirectory+"/js",
       },
       {
         from: 'src/views/my-components/text-editor/tinymce',
-        to: config.dev.assetsSubDirectory,
+        to: config.dev.assetsSubDirectory+"/js",
       }
     ], {
       ignore: [
