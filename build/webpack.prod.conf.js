@@ -10,7 +10,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const OptimizeCSSPlugin = require('optimize-css-assets-webpack-plugin')
 const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
-
+const cleanWebpackPlugin = require('clean-webpack-plugin');
 const env = require('../config/prod.env')
 
 const webpackConfig = merge(baseWebpackConfig, {
@@ -40,6 +40,9 @@ const webpackConfig = merge(baseWebpackConfig, {
       },
       sourceMap: config.build.productionSourceMap,
       parallel: true
+    }),
+    new cleanWebpackPlugin(['dist/*'], {
+      root: path.resolve(__dirname, '../')
     }),
     // extract css into its own file
     new ExtractTextPlugin({
@@ -107,16 +110,26 @@ const webpackConfig = merge(baseWebpackConfig, {
       children: true,
       minChunks: 3
     }),
+    // copy custom static assets
+    new CopyWebpackPlugin([
+      {
+        from: path.resolve(__dirname, '../static'),
+        to: config.dev.assetsSubDirectory,
+        ignore: ['.*']
+      }
+    ]),
     new CopyWebpackPlugin([
       {
         from: 'src/styles/fonts',
         to: 'fonts'
       },
       {
-        from: 'src/views/main-components/theme-switch/theme'
+        from: 'src/views/main-components/theme-switch/theme',
+        to: config.dev.assetsSubDirectory,
       },
       {
-        from: 'src/views/my-components/text-editor/tinymce'
+        from: 'src/views/my-components/text-editor/tinymce',
+        to: config.dev.assetsSubDirectory,
       }
     ], {
       ignore: [
@@ -124,13 +137,6 @@ const webpackConfig = merge(baseWebpackConfig, {
       ]
     }),
     // copy custom static assets
-    new CopyWebpackPlugin([
-      {
-        from: path.resolve(__dirname, '../static'),
-        to: config.build.assetsSubDirectory,
-        ignore: ['.*']
-      }
-    ])
   ]
 })
 
