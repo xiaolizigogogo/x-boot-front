@@ -106,6 +106,7 @@ export default {
       roleModalVisible: false,
       permModalVisible: false,
       modalTitle: "",
+      imageUrl:'',
       serviceForm: {
         name: undefined,
         code: undefined,
@@ -151,6 +152,7 @@ export default {
         {
           title: "图标",
           key: "titleImg",
+          width:200,
           render: (h, params) => {
           return h('div', {
             attrs: {
