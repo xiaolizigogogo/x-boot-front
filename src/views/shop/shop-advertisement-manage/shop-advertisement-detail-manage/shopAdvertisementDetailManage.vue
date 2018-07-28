@@ -315,10 +315,10 @@ export default {
     remove(v) {
       this.$Modal.confirm({
         title: "确认删除",
-        content: "您确认要删除角色 " + v.name + " ?",
+        content: "您确认要删除图片 " + v.name + " ?",
         onOk: () => {
-          this.deleteRequest("/role/delAllByIds", { ids: v.id }).then(res => {
-            if (res.success === true) {
+          this.deleteRequest("/adPositions/ad", { id: v.id }).then(res => {
+            if (res.status ==200) {
               this.$Message.success("删除成功");
               this.init();
             }
