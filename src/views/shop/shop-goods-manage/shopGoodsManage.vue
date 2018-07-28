@@ -48,32 +48,32 @@
               <Option v-for="item in yesOptions" :value="item.value" :key="item.value">{{ item.label }}</Option>
             </Select>
           </FormItem>
-          <FormItem label="零售价格" prop="name">
-            <InputNumber :max="1000" :min="0" v-model="roleForm.retailPrice"></InputNumber>
+          <FormItem label="零售价格" prop="retailPrice">
+            <InputNumber :max="100000" :min="0" v-model="roleForm.retailPrice"></InputNumber>
           </FormItem>
-          <FormItem label="实际价格" prop="name">
-            <InputNumber :max="1000" :min="0" v-model="roleForm.extraPrice"></InputNumber>
+          <FormItem label="实际价格" prop="extraPrice">
+            <InputNumber :max="100000" :min="0" v-model="roleForm.extraPrice"></InputNumber>
           </FormItem>
-          <FormItem label="排序值" prop="name">
+          <FormItem label="排序值" prop="sortOrder">
             <InputNumber :max="1000" :min="0" v-model="roleForm.sortOrder"></InputNumber>
           </FormItem>
-          <FormItem label="是否新品" prop="name">
+          <FormItem label="是否新品" prop="isNew">
             <Select v-model="roleForm.isNew" filterable placeholder="请选择" >
               <Option v-for="item in yesOptions" :value="item.value" :key="item.value">{{ item.label }}</Option>
             </Select>
           </FormItem>
-          <FormItem label="库存单位" prop="name">
+          <FormItem label="库存单位" prop="goodsUnit">
             <Input v-model="roleForm.goodsUnit" placeholder="条/件"/>
           </FormItem>
           <FormItem label="促销描述" prop="name">
             <Input v-model="roleForm.promotionDesc" placeholder="促销描述"/>
           </FormItem>
-          <FormItem label="列表图片" prop="name">
+          <FormItem label="列表图片" prop="listPicUrl">
             <qiniu
               @handleSuccess = "(url) => this.roleForm.listPicUrl = url" :imgUrl="this.listPicUrl">
             </qiniu>
           </FormItem>
-          <FormItem label="详情主图片" prop="name">
+          <FormItem label="详情主图片" prop="primaryPicUrl">
             <qiniu
               @handleSuccess = "(url) => this.roleForm.primaryPicUrl = url" :imgUrl="this.primaryPicUrl">
             </qiniu>
@@ -133,7 +133,14 @@ export default {
       sortColumn: "createTime",
       sortType: "desc",
       modalTitle:"0 ",
-      roleFormValidate:{},
+      roleFormValidate:{
+        name: [{ required: true, message: "商品名称不能为空", trigger: "blur" }],
+        goodsBrief: [{ required: true, message: "不能为空", trigger: "blur" }],
+        retailPrice: [{ required: true, message: "不能为空", trigger: "blur" }],
+        primaryPicUrl: [{ required: true, message: "不能为空", trigger: "blur" }],
+        listPicUrl: [{ required: true, message: "不能为空", trigger: "blur" }],
+        goodsUnit: [{ required: true, message: "不能为空", trigger: "blur" }],
+      },
       yesOptions:[{label:"是",value:1},{label:"否",value:0}],
       parentTypes:[],
       parentTypesMap:{},
