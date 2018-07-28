@@ -74,10 +74,10 @@
         <Modal :title="modalTitle" v-model="roleModalVisible" :mask-closable='false' :width="500">
           <Form ref="roleForm" :model="roleForm" :label-width="80" :rules="roleFormValidate">
             <FormItem label="快递公司" prop="name">
-              <Input v-model="roleForm.shipperName" placeholder="按照Spring Security约定建议以‘ROLE_’开头"/>
+              <Input v-model="roleForm.shipperName" placeholder="快递公司"/>
             </FormItem>
             <FormItem label="快递单号" prop="name">
-              <Input v-model="roleForm.logisticCode" placeholder="按照Spring Security约定建议以‘ROLE_’开头"/>
+              <Input v-model="roleForm.logisticCode" placeholder="快递单号"/>
             </FormItem>
           </Form>
           <div slot="footer">
@@ -123,7 +123,6 @@ export default {
 
       },
       roleFormValidate: {
-        name: [{ required: true, message: "角色名称不能为空", trigger: "blur" }]
       },
       submitLoading: false,
       selectList: [],
@@ -375,17 +374,15 @@ export default {
     },
     submitRole() {
       this.$refs.roleForm.validate(valid => {
-        if (valid) {
           this.submitLoading = true;
           this.putBodyRequest("/orders/ship", this.roleForm).then(res => {
             this.submitLoading = false;
-            if (res.success === true) {
-              this.$Message.success("操作成功");
-              this.init();
-              this.roleModalVisible = false;
-            }
-          });
-        }
+      if (res.status === true) {
+        this.$Message.success("操作成功");
+        this.init();
+        this.roleModalVisible = false;
+      }
+    });
       });
     },
     addRole() {
@@ -457,7 +454,7 @@ export default {
         content: "您确认要删除角色 " + v.name + " ?",
         onOk: () => {
           this.deleteRequest("/role/delAllByIds", { ids: v.id }).then(res => {
-            if (res.success === true) {
+            if (res.status === true) {
               this.$Message.success("删除成功");
               this.init();
             }
@@ -523,7 +520,7 @@ export default {
           });
           ids = ids.substring(0, ids.length - 1);
           this.deleteRequest("/role/delAllByIds", { ids: ids }).then(res => {
-            if (res.success === true) {
+            if (res.status === true) {
               this.$Message.success("删除成功");
               this.init();
             }
