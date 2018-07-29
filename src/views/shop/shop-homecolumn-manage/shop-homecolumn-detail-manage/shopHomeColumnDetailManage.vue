@@ -112,6 +112,7 @@ export default {
       roleForm: {
         name: "",
         imageUrl:"",
+        enabled:1,
         link:"",
         endTime:"",
         mediaType:1,
@@ -397,7 +398,6 @@ export default {
       this.loading = true;
       let params = {
         columnId: this.$route.query.id,
-        enable: 1,
         current:this.pageNumber,
         size:this.pageSize,
         asc: true,
