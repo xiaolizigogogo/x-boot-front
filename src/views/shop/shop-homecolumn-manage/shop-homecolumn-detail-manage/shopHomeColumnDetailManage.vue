@@ -112,7 +112,6 @@ export default {
       roleForm: {
         name: "",
         imageUrl:"",
-        enabled:1,
         link:"",
         endTime:"",
         mediaType:1,
