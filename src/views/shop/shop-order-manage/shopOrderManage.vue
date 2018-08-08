@@ -377,7 +377,7 @@ export default {
           this.submitLoading = true;
           this.putBodyRequest("/orders/ship", this.roleForm).then(res => {
             this.submitLoading = false;
-      if (res.status === true) {
+      if (res.status ==200) {
         this.$Message.success("操作成功");
         this.init();
         this.roleModalVisible = false;
