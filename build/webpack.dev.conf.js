@@ -67,22 +67,18 @@ const devWebpackConfig = merge(baseWebpackConfig, {
     ]),
     new CopyWebpackPlugin([
       {
-        from: 'src/styles/fonts',
-        to: 'fonts'
-      },
-      {
         from: 'src/views/main-components/theme-switch/theme',
-        to: config.dev.assetsSubDirectory+"/js",
+        to: config.dev.assetsSubDirectory,
       },
       {
         from: 'src/views/my-components/text-editor/tinymce',
-        to: config.dev.assetsSubDirectory+"/js",
+        to: config.dev.assetsSubDirectory,
       }
     ], {
       ignore: [
         'text-editor.vue'
       ]
-    }),
+    })
   ]
 })
 

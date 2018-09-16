@@ -156,12 +156,12 @@ export default {
           this.order_info_data = [orderInfo];
           this.card_info_data=orderInfo.cardList;
           this.orderInfo=orderInfo;
-          localStorage.setItem('editorContent',orderInfo.editorContent)
+          localStorage.setItem('editorContent',orderInfo.editorContent==null?"  ":orderInfo.editorContent)
         },
       save(){
         var editorContent=localStorage.getItem('editorContent');
         this.orderInfo.editorContent=editorContent;
-        this.postRequest("/commonorders", {id:this.id,orderInfo:JSON.stringify(this.orderInfo)}).then(res => {
+        this.postBodyRequest("/commonorders", {id:this.id,orderInfo:JSON.stringify(this.orderInfo)}).then(res => {
           if (res.status ==200) {
           this.$Message.success("操作成功");
           this.init();
