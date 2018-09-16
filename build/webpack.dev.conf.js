@@ -68,11 +68,12 @@ const devWebpackConfig = merge(baseWebpackConfig, {
     new CopyWebpackPlugin([
       {
         from: 'src/views/main-components/theme-switch/theme',
-        to: config.dev.assetsSubDirectory,
+        to: config.dev.assetsPublicPath,
       },
       {
         from: 'src/views/my-components/text-editor/tinymce',
-        to: config.dev.assetsSubDirectory,
+        to: config.dev.assetsPublicPath+'/js',
+        ignore:['.*','tinymce/**/*']
       }
     ], {
       ignore: [

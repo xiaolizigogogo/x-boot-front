@@ -12,7 +12,7 @@ module.exports = {
     assetsPublicPath: '/',
     proxyTable: {
       '/xboot/*': {
-        target: 'http://localhost:8888'  // 请求本地 需要xboot后台项目
+        target: 'http://localhost:8890'  // 请求本地 需要xboot后台项目
       }
     },
 

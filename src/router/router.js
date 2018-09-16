@@ -73,6 +73,7 @@ export const otherRouter = {
         { path: 'change-pass', title: '修改密码', name: 'change_pass', component: () => import('@/views/change-pass/change-pass.vue') },
         { path: 'message', title: '消息中心', name: 'message_index', component: () => import('@/views/message/message.vue') },
        { path: 'shopping', title: '购物详情', name: 'shopping', component: () => import('@/views/advanced-router/component/shopping-info.vue') },
+      { path: 'taluoorder', title: '解密详情', name: 'taluoorder', component: () => import('@/views/advanced-router/component/taluoorder-info.vue') },
         {
         path: '/shop/shop-advertisement-manage/shop-advertisement-detail-manage',
         name: 'shop-advertisement-detail-manage',
