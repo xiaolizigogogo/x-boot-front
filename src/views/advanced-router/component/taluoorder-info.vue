@@ -27,9 +27,12 @@
             <Card>
                 <p slot="title">
                     <Icon type="compose"></Icon>
-                    订单详情
+                    解答详情
+                  <Button type="text" @click="save">保存</Button>
                 </p>
-                <texteditor id="aaaa"></texteditor>
+
+                <texteditor :id="id"></texteditor>
+
             </Card>
         </Row>
     </div>
@@ -37,16 +40,20 @@
 
 <script>
 import texteditor from "../../my-components/text-editor/text-editor"
+import Button from "iview/src/components/button/button";
 
 export default {
     name: 'shopping-info',
   components:{
+    Button,
     texteditor
 
   },
     data () {
         return {
             showInfo: false,
+            id:0,
+          orderInfo:'',
           order_info: [
             {
               title: '订单类型',
@@ -142,11 +149,25 @@ export default {
     },
     methods: {
         init () {
-          var orderInfo =JSON.parse(localStorage.getItem('orderInfo'));
+          const orderId=this.$route.query.orderId;
+          this.id=orderId;
+          var orderInfo=JSON.parse(localStorage.getItem('orderInfo'));
           console.log(orderInfo)
           this.order_info_data = [orderInfo];
           this.card_info_data=orderInfo.cardList;
+          this.orderInfo=orderInfo;
+          localStorage.setItem('editorContent',orderInfo.editorContent)
+        },
+      save(){
+        var editorContent=localStorage.getItem('editorContent');
+        this.orderInfo.editorContent=editorContent;
+        this.postRequest("/commonorders", {id:this.id,orderInfo:JSON.stringify(this.orderInfo)}).then(res => {
+          if (res.status ==200) {
+          this.$Message.success("操作成功");
+          this.init();
         }
+      });
+      }
     },
     mounted () {
         this.init();

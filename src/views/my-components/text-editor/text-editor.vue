@@ -65,7 +65,6 @@ export default {
                             localStorage.editorContent = tinymce.get('tinymceEditer').getContent();
                         });
                       editor.on('change', function (e) {
-                        console.log(111)
                         localStorage.editorContent = tinymce.get('tinymceEditer').getContent();
                       });
                     }
