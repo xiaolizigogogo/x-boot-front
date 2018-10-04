@@ -152,11 +152,19 @@ export default {
           title: "客户",
           key: "name",
           align: "center",
+          render:(h,params)=>{
+          return h('div',
+            params.row.name);/*这里的this.row能够获取当前行的数据*/
+        }
         },
         {
-          title: "客户手机",
-          key: "mobile",
+          title: "订单类型",
+          key: "orderType",
           align: "center",
+          render:(h,params)=>{
+          return h('div',
+            params.row.orderType);/*这里的this.row能够获取当前行的数据*/
+        }
         },
         {
           title: "订单状态",
@@ -228,7 +236,7 @@ export default {
                   h('DropdownItem',{
                     props:{
                       name: '确认完成',
-                      disabled:!(params.row.orderStatus=='待解密'),
+                      disabled:!(params.row.status=='待解密'),
                       value:3,
                     }
                   },'确认完成')
@@ -283,11 +291,11 @@ export default {
     },
     changePage(v) {
       this.pageNumber = v;
-      this.getRoleList();
+      this.loadData();
     },
     changePageSize(v) {
       this.pageSize = v;
-      this.getRoleList();
+      this.loadData();
     },
     changeSort(e) {
       this.sortColumn = e.key;
@@ -295,7 +303,7 @@ export default {
       if (e.order === "normal") {
         this.sortType = "";
       }
-      this.getRoleList();
+      this.loadData();
     },
     loadData() {
       this.loading = true;
@@ -303,6 +311,11 @@ export default {
         console.log(res)
         this.loading = false;
         if (res.status === 200) {
+          var d=res.data.records;
+          for(var i=0;i<d.length;i++){
+            var orderInfo=JSON.parse(d[i].orderInfo);
+            d[i].orderInfo=orderInfo;
+          }
           this.data = res.data.records;
           this.total = res.data.total;
         }
@@ -578,8 +591,14 @@ export default {
       this.drop = !this.drop;
     },
     orderInfo(i){
-      localStorage.setItem('orderInfo',i.orderInfo)
-      this.$router.push({path:"/taluoorder",query:{orderId:i.id}});
+      localStorage.setItem('orderInfo',JSON.stringify(i.orderInfo))
+      if(i.orderType=='塔罗牌解密'){
+        this.$router.push({path:"/taluoorder",query:{orderId:i.id}});
+      }
+      else if(i.orderType=='姓名配对'){
+        this.$router.push({path:"/xingmingorder",query:{orderId:i.id}});
+      }
+
     }
 
   },
