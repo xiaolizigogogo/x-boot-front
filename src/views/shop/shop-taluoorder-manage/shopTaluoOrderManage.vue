@@ -598,7 +598,6 @@ export default {
       else if(i.orderType=='姓名配对'){
         this.$router.push({path:"/xingmingorder",query:{orderId:i.id}});
       }
-
     }
 
   },

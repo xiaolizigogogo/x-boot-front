@@ -18,23 +18,11 @@
         <Card>
           <p slot="title">
             <Icon type="compose"></Icon>
-            塔罗牌
+            答案
           </p>
           <Table :columns="card_info" :data="card_info_data"></Table>
         </Card>
       </Row>
-        <Row>
-            <Card>
-                <p slot="title">
-                    <Icon type="compose"></Icon>
-                    解答详情
-                  <Button type="text" @click="save">保存</Button>
-                </p>
-
-                <texteditor :id="id"></texteditor>
-
-            </Card>
-        </Row>
     </div>
 </template>
 
@@ -84,30 +72,15 @@ export default {
           ],
           card_info: [
             {
-              title: '牌名',
-              key: 'name',
-              align: 'center'
-            },
-            {
-              title: '正意',
-              key: 'faceMean',
-              align: 'center'
-            },
-            {
-              title: '反意',
-              key: 'backMean',
-              align: 'center'
-            },
-            {
-              title: '图片',
+              title: '答案',
               key: 'url',
               align: 'center',
-              width:200,
-              height:200,
+              width:1000,
+              height:2000,
               render: (h, params) => {
               return h('div', {
                 attrs: {
-                  style: 'width: 80px;height: 80px;'
+                  style: 'width: 800px;height: 2000px;'
                 },
               }, [
                 h('img', {
@@ -116,14 +89,36 @@ export default {
                     size: 'small'
                   },
                   attrs: {
-                    src: params.row.url, style: 'width: 80px;height: 80px;border-radius: 2px;'
+                    src: params.row.url, style: 'width: 800px;height: 2000px;border-radius: 2px;'
                   },
                   style: {
                   },
                 }),
               ]);
     }
-            }
+            },
+      { title: "操作",
+        key: "action",
+        align: "center",
+        width: 500,
+        render:(h,params) => {
+        return ('div',[
+          h(
+            "Button",
+            {
+              props: {
+                type: "primary",
+                size: "small"
+              },
+              on: {
+                click: () => {
+                this.save();
+      }
+      }
+      },
+        "生成答案"
+      )])
+      }}
           ],
             shopping_col: [
                 {
@@ -154,19 +149,15 @@ export default {
           var orderInfo=JSON.parse(localStorage.getItem('orderInfo'));
           console.log(orderInfo)
           this.order_info_data = [orderInfo];
-          this.card_info_data=orderInfo.cardList;
+          this.card_info_data=[orderInfo];
           this.orderInfo=orderInfo;
-          localStorage.setItem('editorContent',orderInfo.editorContent==null?"  ":orderInfo.editorContent)
+          // localStorage.setItem('editorContent',orderInfo.editorContent==null?"  ":orderInfo.editorContent)
         },
       save(){
-        var editorContent=localStorage.getItem('editorContent');
-        this.orderInfo.editorContent=editorContent;
-        this.postBodyRequest("/commonorders", {id:this.id,orderInfo:JSON.stringify(this.orderInfo)}).then(res => {
-          if (res.status ==200) {
-          this.$Message.success("操作成功");
-          this.init();
-        }
-      });
+        // var editorContent=localStorage.getItem('editorContent');
+        // this.orderInfo.editorContent=editorContent;
+        var url='https://chenxima.yodemon.top/peidui.htm?name1='+this.orderInfo.name1+'&name2='+this.orderInfo.name2+'&orderId='+this.id
+        window.open(url)
       }
     },
     mounted () {
