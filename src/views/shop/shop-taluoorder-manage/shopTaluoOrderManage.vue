@@ -9,36 +9,28 @@
                   <Row>
                     <Form ref="searchForm" :model="searchForm" inline :label-width="70" class="search-form">
                       <Form-item label="编号" prop="orderSn">
-                        <Input type="text" v-model="searchForm.orderSn" clearable placeholder="请输入编号" style="width: 200px"/>
+                        <Input type="text" v-model="searchForm.orderId" clearable placeholder="请输入编号" style="width: 200px"/>
                       </Form-item>
                       <Form-item label="客户" prop="userName">
-                        <Input type="text" v-model="searchForm.userName" clearable placeholder="请输入名称" style="width: 200px"/>
+                        <Input type="text" v-model="searchForm.name" clearable placeholder="请输入名称" style="width: 200px"/>
                       </Form-item>
                       <Form-item label="客户手机" prop="mobile">
-                        <Input type="text" v-model="searchForm.mobile" clearable placeholder="客户手机" style="width: 200px"/>
+                        <Input type="text" v-model="searchForm.phone" clearable placeholder="客户手机" style="width: 200px"/>
                       </Form-item>
                       <span v-if="drop">
-                              <Form-item label="支付状态" prop="subscribeStatus">
-                                <Select v-model="searchForm.payStatus" placeholder="支付状态" clearable style="width: 200px">
+                              <Form-item label="订单类型" prop="subscribeStatus">
+                                <Select v-model="searchForm.orderType" placeholder="支付状态" clearable style="width: 200px">
                                   <Option value="">全部</Option>
-                                  <Option value=0>未支付</Option>
-                                  <Option value=1>已支付</Option>
+                                  <Option value='姓名配对'>姓名配对</Option>
+                                  <Option value='塔罗牌解密'>塔罗牌解密</Option>
                                 </Select>
                               </Form-item>
-                               <Form-item label="物流状态" prop="subscribeStatus">
-                                <Select v-model="searchForm.orderStatus" placeholder="物流状态" clearable style="width: 200px">
+                              <Form-item label="订单状态" prop="status">
+                                <Select v-model="searchForm.status" placeholder="订单状态" clearable style="width: 200px">
                                    <Option value="">全部</Option>
-                                  <Option value=0>未发货</Option>
-                                  <Option value=1>已发货</Option>
-                                </Select>
-                              </Form-item>
-                              <Form-item label="订单状态" prop="subscribeStatus">
-                                <Select v-model="searchForm.shippingStatus" placeholder="订单状态" clearable style="width: 200px">
-                                   <Option value="">全部</Option>
-                                  <Option value=0>待确认</Option>
-                                  <Option value=1>已确认</Option>
-                                   <Option value=2>已完成</Option>
-                                   <Option value=-1>已取消</Option>
+                                  <Option value='待支付'>待支付</Option>
+                                  <Option value='待解密'>待解密</Option>
+                                   <Option value='已完成'>已完成</Option>
                                 </Select>
                               </Form-item>
                             </span>
@@ -262,12 +254,10 @@ export default {
         size: this.pageSize,
         asc: false,
         descs:"gmtCreate",
-        mobile:undefined,
-        userName:undefined,
-        orderSn:undefined,
-        shippingStatus:undefined,
-        payStatus:undefined,
-        orderStatus:undefined
+        phone:undefined,
+        name:undefined,
+        orderType:undefined,
+        status:undefined
       },
       orderStatusMap:{
         "0":"待确认",
@@ -606,3 +596,5 @@ export default {
   }
 };
 </script>
+
+

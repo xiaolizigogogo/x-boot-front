@@ -24,7 +24,7 @@ const option = {
                   fontSize : 30
                 }
             },
-            data: [{value: 50, name: '信用评分'}],
+            data: [{value: 50, name: '调用次数'}],
             center: ['50%', '50%'],
             radius: '120%',
             startAngle: 200,
