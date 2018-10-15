@@ -103,7 +103,7 @@
 <script>
 import {formatDate} from '../../../utils/global'
 export default {
-  name: "shop-subscribe-manage",
+  name: "shop-chenxisubscribe-manage",
   data() {
     return {
       loading: true,
