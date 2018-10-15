@@ -203,62 +203,8 @@ export default {
                   }
                 }
               },
-              "查看"
-            ),
-              h('Dropdown',{
-                on:{
-                  'on-click':(value)=>{
-                    this.editSubscribe(params.row,value);
-                  }
-                }
-              },[
-                h('div',{
-                  class:{
-                    member_operate_div: true
-                  }
-                },[h(
-                  "Button",
-                  {
-                    props: {
-                      type: "warning",
-                      size: "small"
-                    },
-                    style: {
-                      marginRight: "5px"
-                    }
-                  },["状态修改",
-                    h('Icon',{
-                      props:{
-                        type: 'arrow-down-b'
-                      }
-                    })]
-                )]),
-                h('DropdownMenu',{
-                  slot:'list'
-                },[
-                  h('DropdownItem',{
-                    props:{
-                      name: '确认',
-                      disabled:!(params.row.subscribeStatus==0),
-                      value:1,
-                    }
-                  },'确认'),
-                  h('DropdownItem',{
-                    props:{
-                      name: '完成',
-                      disabled:!(params.row.subscribeStatus==1),
-                      value:2,
-                    }
-                  },'完成'),
-                  h('DropdownItem',{
-                    props:{
-                      name: '取消',
-                      disabled:!(params.row.subscribeStatus!=-1&&params.row.subscribeStatus!=2),
-                      value:-1
-                    }
-                  },'取消'),
-                ])
-              ])
+              "删除"
+            )
             ])
           }}
 
