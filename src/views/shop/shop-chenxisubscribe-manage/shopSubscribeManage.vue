@@ -190,7 +190,21 @@ export default {
           align: "center",
           width: 200,
           render:(h,params) => {
-            return ('div',[
+            return ('div',[h(
+              "Button",
+              {
+                props: {
+                  type: "primary",
+                  size: "small"
+                },
+                on: {
+                  click: () => {
+                    this.remove(params.row);
+                  }
+                }
+              },
+              "查看"
+            ),
               h('Dropdown',{
                 on:{
                   'on-click':(value)=>{
