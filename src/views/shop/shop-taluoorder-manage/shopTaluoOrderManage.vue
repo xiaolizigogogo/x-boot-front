@@ -228,7 +228,7 @@ export default {
                   h('DropdownItem',{
                     props:{
                       name: '确认完成',
-                      disabled:!(params.row.status=='待解密'),
+                      disabled:(params.row.status!='待收货'),
                       value:3,
                     }
                   },'确认完成')
@@ -377,13 +377,13 @@ export default {
         return
       }
       else if(n=="确认订单"){
-        params.orderStatus=1
+        params.status=1
       }
       else if(n=="确认完成"){
-        params.orderStatus='已解密'
+        params.status='已解密'
       }
       else if(n=="取消订单"){
-        params.orderStatus=-1
+        params.status=-1
       }
       this.$Modal.confirm({
         title: n,
