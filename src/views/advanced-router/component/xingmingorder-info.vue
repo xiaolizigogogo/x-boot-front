@@ -19,11 +19,16 @@
           <p slot="title">
             <Icon type="compose"></Icon>
             答案
+            <button @click="save">生成答案</button>
           </p>
           <Table :columns="card_info" :data="card_info_data"></Table>
         </Card>
       </Row>
+      <Modal title="分配权限(点击选择)"  :width="400">
+
+      </Modal>
     </div>
+
 </template>
 
 <script>
@@ -97,28 +102,6 @@ export default {
               ]);
     }
             },
-      { title: "操作",
-        key: "action",
-        align: "center",
-        width: 500,
-        render:(h,params) => {
-        return ('div',[
-          h(
-            "Button",
-            {
-              props: {
-                type: "primary",
-                size: "small"
-              },
-              on: {
-                click: () => {
-                this.save();
-      }
-      }
-      },
-        "生成答案"
-      )])
-      }}
           ],
             shopping_col: [
                 {
@@ -146,18 +129,26 @@ export default {
         init () {
           const orderId=this.$route.query.orderId;
           this.id=orderId;
-          var orderInfo=JSON.parse(localStorage.getItem('orderInfo'));
-          console.log(orderInfo)
-          this.order_info_data = [orderInfo];
-          this.card_info_data=[orderInfo];
-          this.orderInfo=orderInfo;
-          // localStorage.setItem('editorContent',orderInfo.editorContent==null?"  ":orderInfo.editorContent)
+          this.getRequest('/commonorders/one',{id:orderId}).then(res =>{
+                var order=res.data;
+            var orderInfo=JSON.parse(order.orderInfo);
+            this.order_info_data = [orderInfo];
+            this.card_info_data=[orderInfo];
+            this.orderInfo=orderInfo;
+          })
         },
       save(){
         // var editorContent=localStorage.getItem('editorContent');
         // this.orderInfo.editorContent=editorContent;
         var url='https://chenxima.yodemon.top/peidui.htm?name1='+this.orderInfo.name1+'&name2='+this.orderInfo.name2+'&orderId='+this.id
         window.open(url)
+        this.$Modal.confirm({
+          title: "操作成功",
+          content: "答案生成成功",
+          onOk: () => {
+              this.init();
+          }
+        });
       }
     },
     mounted () {

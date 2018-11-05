@@ -1,5 +1,5 @@
 <style lang="less">
-@import "shopTaluoOrderManage.less";
+@import "shopSubscribeManage.less";
 </style>
 <template>
     <div class="search">
@@ -8,29 +8,25 @@
                 <Card>
                   <Row>
                     <Form ref="searchForm" :model="searchForm" inline :label-width="70" class="search-form">
-                      <Form-item label="编号" prop="orderSn">
-                        <Input type="text" v-model="searchForm.orderId" clearable placeholder="请输入编号" style="width: 200px"/>
+                      <Form-item label="编号" prop="subscribeId">
+                        <Input type="text" v-model="searchForm.subscribeId" clearable placeholder="请输入编号" style="width: 200px"/>
                       </Form-item>
                       <Form-item label="客户" prop="userName">
-                        <Input type="text" v-model="searchForm.name" clearable placeholder="请输入名称" style="width: 200px"/>
+                        <Input type="text" v-model="searchForm.userName" clearable placeholder="请输入名称" style="width: 200px"/>
                       </Form-item>
-                      <Form-item label="客户手机" prop="mobile">
-                        <Input type="text" v-model="searchForm.phone" clearable placeholder="客户手机" style="width: 200px"/>
+                      <Form-item label="客户手机" prop="phoneNumber">
+                        <Input type="text" v-model="searchForm.phoneNumber" clearable placeholder="客户手机" style="width: 200px"/>
                       </Form-item>
                       <span v-if="drop">
-                              <Form-item label="订单类型" prop="subscribeStatus">
-                                <Select v-model="searchForm.orderType" placeholder="支付状态" clearable style="width: 200px">
-                                  <Option value="">全部</Option>
-                                  <Option value='姓名配对'>姓名配对</Option>
-                                  <Option value='塔罗牌解密'>塔罗牌解密</Option>
-                                </Select>
+                              <Form-item label="预约员工" prop="adminName">
+                                <Input type="text" v-model="searchForm.adminName" clearable placeholder="预约员工" style="width: 200px"/>
                               </Form-item>
-                              <Form-item label="订单状态" prop="status">
-                                <Select v-model="searchForm.status" placeholder="订单状态" clearable style="width: 200px">
-                                   <Option value="">全部</Option>
-                                  <Option value='待支付'>待支付</Option>
-                                  <Option value='待解密'>待解密</Option>
-                                   <Option value='已完成'>已完成</Option>
+                              <Form-item label="预约状态" prop="subscribeStatus">
+                                <Select v-model="searchForm.subscribeStatus" placeholder="预约状态" clearable style="width: 200px">
+                                  <Option value=0>待确认</Option>
+                                  <Option value=1>已确认</Option>
+                                   <Option value=2>已完成</Option>
+                                   <Option value=-1>已取消</Option>
                                 </Select>
                               </Form-item>
                             </span>
@@ -44,7 +40,7 @@
                     </Form>
                   </Row>
                     <Row class="operation">
-                        <!--<Button @click="addRole" type="primary" icon="plus-round">添加角色</Button>-->
+                        <!--<Button @click="addRole" type="primary" icon="plus-round">添加预约</Button>-->
                         <!--<Button @click="delAll" type="ghost" icon="trash-a">批量删除</Button>-->
                         <Button @click="init" type="ghost" icon="refresh">刷新</Button>
                     </Row>
@@ -65,11 +61,26 @@
         </Row>
         <Modal :title="modalTitle" v-model="roleModalVisible" :mask-closable='false' :width="500">
           <Form ref="roleForm" :model="roleForm" :label-width="80" :rules="roleFormValidate">
-            <FormItem label="快递公司" prop="name">
-              <Input v-model="roleForm.shipperName" placeholder="快递公司"/>
+            <FormItem label="客户名称" prop="name">
+              <Input v-model="roleForm.name" placeholder="客户名称" readonly/>
             </FormItem>
-            <FormItem label="快递单号" prop="name">
-              <Input v-model="roleForm.logisticCode" placeholder="快递单号"/>
+            <FormItem label="客户手机" prop="name">
+              <Input v-model="roleForm.name" placeholder="客户手机" readonly/>
+            </FormItem>
+            <FormItem label="预约时间" prop="name">
+              <Input v-model="roleForm.name" placeholder="预约时间"/>
+            </FormItem>
+            <FormItem label="预约项目" prop="name">
+              <Input v-model="roleForm.name" placeholder="预约项目"/>
+            </FormItem>
+            <FormItem label="预约员工" prop="name">
+              <Input v-model="roleForm.name" placeholder="预约员工"/>
+            </FormItem>
+            <FormItem label="预约状态" prop="name">
+              <Input v-model="roleForm.name" placeholder="预约状态"/>
+            </FormItem>
+            <FormItem label="结束状态" prop="name">
+              <Input v-model="roleForm.name" placeholder="结束状态"/>
             </FormItem>
           </Form>
           <div slot="footer">
@@ -92,7 +103,7 @@
 <script>
 import {formatDate} from '../../../utils/global'
 export default {
-  name: "shop-taluoorder-manage",
+  name: "shop-chenxisubscribe-manage",
   data() {
     return {
       loading: true,
@@ -105,16 +116,10 @@ export default {
       permModalVisible: false,
       modalTitle: "",
       roleForm: {
-        shipperName: "",
-        logisticCode:"",
-        orderId:"",
-        shipperCode:"-",
-        traces:"-",
-        isFinish:0,
-        requestCount:0,
-
+        name: ""
       },
       roleFormValidate: {
+        name: [{ required: true, message: "角色名称不能为空", trigger: "blur" }]
       },
       submitLoading: false,
       selectList: [],
@@ -122,12 +127,12 @@ export default {
       columns: [
         {
           type: "selection",
-          width: 60,
+          width: 55,
           align: "center"
         },
         {
-          title: "订单编号",
-          key: "orderId",
+          title: "编号",
+          key: "subscribeId",
           sortable: true
         },
         {
@@ -142,101 +147,67 @@ export default {
         },
         {
           title: "客户",
-          key: "name",
+          key: "userName",
+          align: "center",
+        },
+        {
+          title: "客户手机",
+          key: "phoneNumber",
+          align: "center",
+        },
+        {
+          title: "星座",
+          key: "productUrl",
+          align: "center",
+        },
+        {
+          title: "性别",
+          key: "userNumber",
+          align: "center",
+        },
+        {
+          title: "预约项目",
+          key: "adminName",
+          align: "center",
+        },
+        {
+          title: "问题",
+          key: "productName",
+          align: "center",
+        },
+        {
+          title: "预约状态",
+          key: "subscribeStatus",
           align: "center",
           render:(h,params)=>{
-          return h('div',
-            params.row.name);/*这里的this.row能够获取当前行的数据*/
-        }
-        },
-        {
-          title: "订单类型",
-          key: "orderType",
-          align: "center",
-          render:(h,params)=>{
-          return h('div',
-            params.row.orderType);/*这里的this.row能够获取当前行的数据*/
-        }
-        },
-        {
-          title: "订单状态",
-          key: "status",
-          align: "center"
-          // render:(h,params)=>{
-          //   return h('div',
-          //     this.orderStatusMap[params.row.orderStatus]);/*这里的this.row能够获取当前行的数据*/
-          // }
-        },
-        {
-          title: "订单金额",
-          key: "orderPrice",
-          align: "center",
-        },
+            return h('div',
+              this.subscribeStatusMap[params.row.subscribeStatus]
+            );
+        }},
         {
           title: "操作",
           key: "action",
           align: "center",
-          width: 300,
+          width: 200,
           render:(h,params) => {
-            return ('div',[
-                        h(
-                "Button",
-                {
-                  props: {
-                    type: "primary",
-                    size: "small"
-                  },
-                  on: {
-                    click: () => {
-                      this.orderInfo(params.row);
-                    }
-                  }
+            return ('div',[h(
+              "Button",
+              {
+                props: {
+                  type: "primary",
+                  size: "small"
                 },
-                "查看"
-              ),
-              h('Dropdown',{
-                on:{
-                  'on-click':(value)=>{
-                    this.editOrderStatus(params.row,value);
+                on: {
+                  click: () => {
+                    this.remove(params.row);
                   }
                 }
-              },[
-                h('div',{
-                  class:{
-                    member_operate_div: true
-                  }
-                },[h(
-                  "Button",
-                  {
-                    props: {
-                      type: "warning",
-                      size: "small"
-                    },
-                    style: {
-                      marginRight: "5px"
-                    }
-                  },["状态修改",
-                    h('Icon',{
-                      props:{
-                        type: 'arrow-down-b'
-                      }
-                    })]
-                )]),
-                h('DropdownMenu',{
-                  slot:'list'
-                },[
-                  h('DropdownItem',{
-                    props:{
-                      name: '确认完成',
-                      disabled:!(params.row.status=='待解密'),
-                      value:3,
-                    }
-                  },'确认完成')
-                ])
-              ])
+              },
+              "删除"
+            )
             ])
-          }
-        }
+          }}
+
       ],
       data: [],
       pageNumber: 1,
@@ -254,26 +225,24 @@ export default {
         size: this.pageSize,
         asc: false,
         descs:"gmtCreate",
-        phone:undefined,
-        name:undefined,
-        orderType:undefined,
-        status:undefined
+        subscribeId:undefined,
+        userName:undefined,
+        phoneNumber:undefined,
+        subscribeStatus:undefined,
+        adminName:undefined
       },
-      orderStatusMap:{
+      subscribeStatusMap:{
         "0":"待确认",
         "1":"已确认",
         "2":"已完成",
-        "-1":"已取消"
+        "-1":"已取消",
       },
-      payStatusMap:{
-        "0":"未支付",
-        "1":"已支付",
-      },
-      shippingStatus:{
-        "0":"未发货",
-        "1":"已发货"
+      subscribeActionMap:{
+        "确认":"1",
+        "完成":"2",
+        "取消":"-1",
       }
-    };
+    }
   },
   methods: {
     init() {
@@ -297,15 +266,10 @@ export default {
     },
     loadData() {
       this.loading = true;
-      this.getRequest("/commonorders", this.searchForm).then(res => {
-        console.log(res)
+
+      this.getRequest("/subscribes", this.searchForm).then(res => {
         this.loading = false;
         if (res.status === 200) {
-          var d=res.data.records;
-          for(var i=0;i<d.length;i++){
-            var orderInfo=JSON.parse(d[i].orderInfo);
-            d[i].orderInfo=orderInfo;
-          }
           this.data = res.data.records;
           this.total = res.data.total;
         }
@@ -329,20 +293,27 @@ export default {
     },
     submitRole() {
       this.$refs.roleForm.validate(valid => {
+        if (valid) {
+          let url = "/role/save";
+          if (this.modalType === 1) {
+            // 编辑用户
+            url = "/role/edit";
+          }
           this.submitLoading = true;
-          this.putBodyRequest("/orders/ship", this.roleForm).then(res => {
+          this.postRequest(url, this.roleForm).then(res => {
             this.submitLoading = false;
-      if (res.status ==200) {
-        this.$Message.success("操作成功");
-        this.init();
-        this.roleModalVisible = false;
-      }
-    });
+            if (res.success === true) {
+              this.$Message.success("操作成功");
+              this.init();
+              this.roleModalVisible = false;
+            }
+          });
+        }
       });
     },
     addRole() {
       this.modalType = 0;
-      this.modalTitle = "添加角色";
+      this.modalTitle = "添加预约";
       this.roleForm = {
         name: "",
         access: null
@@ -351,7 +322,7 @@ export default {
     },
     edit(v) {
       this.modalType = 1;
-      this.modalTitle = "编辑角色";
+      this.modalTitle = "编辑预约";
       // 转换null为""
       for (let attr in v) {
         if (v[attr] === null) {
@@ -363,53 +334,31 @@ export default {
       this.roleForm = roleInfo;
       this.roleModalVisible = true;
     },
-
-    editOrderStatus(v,n){
-      let params={
-            id:v.id
-      }
-      if(n=="确认发货"){
-        this.modalType = 1;
-        this.modalTitle='确认发货';
-        this.roleModalVisible=true;
-        this.roleForm.orderId=v.id
-        params.shippingStatus=1
-        return
-      }
-      else if(n=="确认订单"){
-        params.orderStatus=1
-      }
-      else if(n=="确认完成"){
-        params.orderStatus='已解密'
-      }
-      else if(n=="取消订单"){
-        params.orderStatus=-1
-      }
+    editSubscribe(v,n) {
+      console.log(n)
       this.$Modal.confirm({
-        title: n,
-        content: "您确认要"+n+ v.orderId + " ?",
+        title: "确认"+n,
+        content: "您确认要"+n+"预约 " + v.subscribeId + " ?",
         onOk: () => {
-          this.putBodyRequest("/commonorders",params).then(res=>{
-            if (res.status === 200) {
-              this.$Message.success("操作成功");
+          this.putBodyRequest("/subscribes", { id: v.id ,subscribeStatus:this.subscribeActionMap[n]}).then(res => {
+            if (res.status == 200) {
+              this.$Message.success(n+"成功");
               this.init();
             }
             else{
-              this.$Message.success("操作失败");
-              this.init();
+              this.$Message.success(n+"失败!"+res.error);
             }
-          })
+          });
         }
       });
-
     },
     remove(v) {
       this.$Modal.confirm({
         title: "确认删除",
-        content: "您确认要删除角色 " + v.name + " ?",
+        content: "您确认要删除预约 " + v.subscribeId + " ?",
         onOk: () => {
-          this.deleteRequest("/role/delAllByIds", { ids: v.id }).then(res => {
-            if (res.status === true) {
+          this.deleteRequest("/subscribes", { id: v.id }).then(res => {
+            if (res.status == 200) {
               this.$Message.success("删除成功");
               this.init();
             }
@@ -475,7 +424,7 @@ export default {
           });
           ids = ids.substring(0, ids.length - 1);
           this.deleteRequest("/role/delAllByIds", { ids: ids }).then(res => {
-            if (res.status === true) {
+            if (res.success === true) {
               this.$Message.success("删除成功");
               this.init();
             }
@@ -580,21 +529,9 @@ export default {
       }
       this.drop = !this.drop;
     },
-    orderInfo(i){
-      localStorage.setItem('orderInfo',JSON.stringify(i.orderInfo))
-      if(i.orderType=='塔罗牌解密'){
-        this.$router.push({path:"/taluoorder",query:{orderId:i.id}});
-      }
-      else if(i.orderType=='姓名配对'){
-        this.$router.push({path:"/xingmingorder",query:{orderId:i.id}});
-      }
-    }
-
   },
   mounted() {
     this.init();
   }
 };
 </script>
-
-
