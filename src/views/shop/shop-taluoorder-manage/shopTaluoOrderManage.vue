@@ -399,7 +399,7 @@ export default {
         title: n,
         content: "您确认要"+n+ v.orderId + " ?",
         onOk: () => {
-          this.putBodyRequest("/orders",params).then(res=>{
+          this.putBodyRequest("/commonorders",params).then(res=>{
             if (res.status === 200) {
               this.$Message.success("操作成功");
               this.init();
