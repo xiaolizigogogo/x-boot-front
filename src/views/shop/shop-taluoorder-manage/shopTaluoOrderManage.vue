@@ -297,6 +297,8 @@ export default {
     },
     loadData() {
       this.loading = true;
+      this.searchForm.current=this.pageNumber
+      this.searchForm.size=this.pageSize
       this.getRequest("/commonorders", this.searchForm).then(res => {
         console.log(res)
         this.loading = false;

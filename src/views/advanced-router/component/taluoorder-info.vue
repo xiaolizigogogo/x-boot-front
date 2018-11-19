@@ -151,12 +151,19 @@ export default {
         init () {
           const orderId=this.$route.query.orderId;
           this.id=orderId;
-          var orderInfo=JSON.parse(localStorage.getItem('orderInfo'));
-          console.log(orderInfo)
-          this.order_info_data = [orderInfo];
-          this.card_info_data=orderInfo.cardList;
-          this.orderInfo=orderInfo;
-          localStorage.setItem('editorContent',orderInfo.editorContent==null?"  ":orderInfo.editorContent)
+          this.getRequest("/commonorders/one",{id:this.id}).then(res=>{
+            if (res.status ==200) {
+            var orderInfo=JSON.parse(res.data.orderInfo);
+            console.log(orderInfo)
+            this.order_info_data = [orderInfo];
+            this.card_info_data=orderInfo.cardList;
+            this.orderInfo=orderInfo;
+            localStorage.setItem('editorContent',orderInfo.editorContent==null?"  ":orderInfo.editorContent)
+          }
+          else{
+            this.$Message.success("操作成功");
+          }
+          })
         },
       save(){
         var editorContent=localStorage.getItem('editorContent');
