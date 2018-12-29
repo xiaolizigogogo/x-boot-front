@@ -2,65 +2,111 @@
 @import "shopMemberManage.less";
 </style>
 <template>
-    <div class="search">
-        <Row>
-            <Col>
-                <Card>
-
-                  <Row>
-                    <Form ref="searchForm" :model="searchForm" inline :label-width="70" class="search-form">
-                      <Form-item label="客户" prop="username">
-                        <Input type="text" v-model="searchForm.username" clearable placeholder="请输入名称" style="width: 200px"/>
-                      </Form-item>
-                      <Form-item label="客户手机" prop="mobile">
-                        <Input type="text" v-model="searchForm.mobile" clearable placeholder="客户手机" style="width: 200px"/>
-                      </Form-item>
-                      <Form-item style="margin-left:-35px;">
-                        <Button @click="handleSearch" type="primary" icon="search">搜索</Button>
-                        <Button @click="handleReset" type="ghost" >重置</Button>
-                        <a class="drop-down" @click="dropDown">{{dropDownContent}}
-                          <Icon :type="dropDownIcon"></Icon>
-                        </a>
-                      </Form-item>
-                    </Form>
-                  </Row>
-                    <Row class="operation">
-                        <Button @click="init" type="ghost" icon="refresh">刷新</Button>
-                    </Row>
-                     <Row>
-                        <Alert show-icon>
-                            已选择 <span class="select-count">{{selectCount}}</span> 项
-                            <a class="select-clear" @click="clearSelectAll">清空</a>
-                        </Alert>
-                    </Row>
-                    <Row class="margin-top-10 searchable-table-con1">
-                        <Table :loading="loading" border :columns="columns" :data="data" ref="table" sortable="custom" @on-sort-change="changeSort" @on-selection-change="changeSelect"></Table>
-                    </Row>
-                    <Row type="flex" justify="end" class="code-row-bg page">
-                        <Page :current="this.pageNumber" :total="total" :page-size="this.pageSize" @on-change="changePage" @on-page-size-change="changePageSize" :page-size-opts="[10,20,50,100]" size="small" show-total show-elevator show-sizer></Page>
-                    </Row>
-                </Card>
-            </Col>
-        </Row>
-      <Modal :title="editTitle" v-model="editModalVisible" :mask-closable='false' :width="500">
-        <Form ref="editForm" :model="editForm" :label-width="80" :rules="editFormValidate">
-          <FormItem label="用户名" prop="memberName">
-            <Input  v-model="editForm.nideshopTrade.memberName" :readonly="true" :maxlength="7"></Input>
-          </FormItem>
-          <FormItem label="交易金额" prop="tradeMoney">
-            <InputNumber :max="1000000" :min="1" v-model="editForm.nideshopTrade.tradeMoney"  placeholder="输入交易金额" ></InputNumber>
-          </FormItem>
-        </Form>
-        <div slot="footer">
-          <Button type="text" @click="cancelEdit">取消</Button>
-          <Button type="primary" :loading="submitLoading" @click="submitEdit">提交</Button>
-        </div>
-      </Modal>
-    </div>
+  <div class="search">
+    <Row>
+      <Col>
+        <Card>
+          <Row>
+            <Form ref="searchForm" :model="searchForm" inline :label-width="70" class="search-form">
+              <Form-item label="客户" prop="username">
+                <Input
+                  type="text"
+                  v-model="searchForm.username"
+                  clearable
+                  placeholder="请输入名称"
+                  style="width: 200px"
+                />
+              </Form-item>
+              <Form-item label="客户手机" prop="mobile">
+                <Input
+                  type="text"
+                  v-model="searchForm.mobile"
+                  clearable
+                  placeholder="客户手机"
+                  style="width: 200px"
+                />
+              </Form-item>
+              <Form-item style="margin-left:-35px;">
+                <Button @click="handleSearch" type="primary" icon="search">搜索</Button>
+                <Button @click="handleReset" type="ghost">重置</Button>
+                <a class="drop-down" @click="dropDown">
+                  {{dropDownContent}}
+                  <Icon :type="dropDownIcon"></Icon>
+                </a>
+              </Form-item>
+            </Form>
+          </Row>
+          <Row class="operation">
+            <Button @click="init" type="ghost" icon="refresh">刷新</Button>
+          </Row>
+          <Row>
+            <Alert show-icon>
+              已选择
+              <span class="select-count">{{selectCount}}</span> 项
+              <a class="select-clear" @click="clearSelectAll">清空</a>
+            </Alert>
+          </Row>
+          <Row class="margin-top-10 searchable-table-con1">
+            <Table
+              :loading="loading"
+              border
+              :columns="columns"
+              :data="data"
+              ref="table"
+              sortable="custom"
+              @on-sort-change="changeSort"
+              @on-selection-change="changeSelect"
+            ></Table>
+          </Row>
+          <Row type="flex" justify="end" class="code-row-bg page">
+            <Page
+              :current="this.pageNumber"
+              :total="total"
+              :page-size="this.pageSize"
+              @on-change="changePage"
+              @on-page-size-change="changePageSize"
+              :page-size-opts="[10,20,50,100]"
+              size="small"
+              show-total
+              show-elevator
+              show-sizer
+            ></Page>
+          </Row>
+        </Card>
+      </Col>
+    </Row>
+    <Modal :title="editTitle" v-model="editModalVisible" :mask-closable="false" :width="500">
+      <Form ref="editForm" :model="editForm" :label-width="80" :rules="editFormValidate">
+        <FormItem label="用户名" prop="memberName">
+          <Input v-model="editForm.nideshopTrade.memberName" :readonly="true" :maxlength="7" />
+        </FormItem>
+        <FormItem label="会员卡" prop="selectCard">
+          <Select v-model="selectCard" placeholder="会员卡" clearable style="width: 200px" @change="cardChange($event)">
+            <Option v-for="(item,index) in cardOptions" v-bind:key="item.id" v-bind:value="index">{{item.cardName}}</Option>
+          </Select>
+        </FormItem>
+        <FormItem label="余额" prop="restMoney">
+            <Input v-model="restMoney" :readonly="true" :maxlength="7" />
+        </FormItem>
+        <FormItem label="交易金额" prop="tradeMoney">
+          <InputNumber
+            :max="1000000"
+            :min="1"
+            v-model="editForm.nideshopTrade.tradeMoney"
+            placeholder="输入交易金额"
+          ></InputNumber>
+        </FormItem>
+      </Form>
+      <div slot="footer">
+        <Button type="text" @click="cancelEdit">取消</Button>
+        <Button type="primary" :loading="submitLoading" @click="submitEdit">提交</Button>
+      </div>
+    </Modal>
+  </div>
 </template>
 
 <script>
-import {formatDate,fmoney} from '../../../utils/global'
+import { formatDate, fmoney } from "../../../utils/global";
 export default {
   name: "shop-member-manage",
   data() {
@@ -75,13 +121,12 @@ export default {
       permModalVisible: false,
       editModalVisible: false,
       editTitle: "",
-      editForm:{
-        nideshopTrade:{
-          memberName:"",
-          birthday:"",
-          tradeMoney:1
+      editForm: {
+        nideshopTrade: {
+          memberName: "",
+          birthday: "",
+          tradeMoney: 1
         }
-
       },
       editFormValidate: {
         name: [{ required: true, message: "角色名称不能为空", trigger: "blur" }]
@@ -96,6 +141,8 @@ export default {
       submitLoading: false,
       selectList: [],
       selectCount: 0,
+      cardOptions:[],
+      selectCard:'',
       columns: [
         {
           type: "selection",
@@ -126,33 +173,39 @@ export default {
           title: "手机号",
           key: "mobile",
           sortable: true,
-          sortType: "desc",
+          sortType: "desc"
         },
         {
           title: "累计消费",
           key: "purchaseMoney",
           sortable: true,
-          render:(h,params)=>{
-            return h('div',
-              fmoney(params.row.purchaseMoney,2));/*这里的this.row能够获取当前行的数据*/
+          render: (h, params) => {
+            return h(
+              "div",
+              fmoney(params.row.purchaseMoney, 2)
+            ); /*这里的this.row能够获取当前行的数据*/
           }
         },
         {
           title: "累计充值",
           key: "rechargeMoney",
           sortable: true,
-          render:(h,params)=>{
-            return h('div',
-              fmoney(params.row.rechargeMoney,2));/*这里的this.row能够获取当前行的数据*/
+          render: (h, params) => {
+            return h(
+              "div",
+              fmoney(params.row.rechargeMoney, 2)
+            ); /*这里的this.row能够获取当前行的数据*/
           }
         },
         {
           title: "余额",
           key: "restMoney",
           sortable: true,
-          render:(h,params)=>{
-            return h('div',
-              fmoney(params.row.restMoney,2));/*这里的this.row能够获取当前行的数据*/
+          render: (h, params) => {
+            return h(
+              "div",
+              fmoney(params.row.restMoney, 2)
+            ); /*这里的this.row能够获取当前行的数据*/
           }
         },
         {
@@ -173,19 +226,26 @@ export default {
           title: "注册时间",
           key: "registerTime",
           sortable: true,
-          render:(h,params)=>{
-            return h('div',
-              params.row.registerTime?
-                formatDate(new Date(params.row.registerTime*1000)):"-");/*这里的this.row能够获取当前行的数据*/
-          }},
+          render: (h, params) => {
+            return h(
+              "div",
+              params.row.registerTime
+                ? formatDate(new Date(params.row.registerTime * 1000))
+                : "-"
+            ); /*这里的this.row能够获取当前行的数据*/
+          }
+        },
         {
           title: "最后登录时间",
           key: "lastLoginTime",
           sortable: true,
-          render:(h,params)=>{
-            return h('div',
-              params.row.lastLoginTime?
-                formatDate(new Date(params.row.lastLoginTime*1000)):"-");/*这里的this.row能够获取当前行的数据*/
+          render: (h, params) => {
+            return h(
+              "div",
+              params.row.lastLoginTime
+                ? formatDate(new Date(params.row.lastLoginTime * 1000))
+                : "-"
+            ); /*这里的this.row能够获取当前行的数据*/
           }
         },
         {
@@ -194,105 +254,134 @@ export default {
           sortable: false,
           align: "center",
           width: 300,
-          render:(h,params) => {
-            return ('div',[
-              h('Dropdown',{
-                on:{
-                  'on-click':(value)=>{
-                    this.edit(params.row,value);
-                  }
-                }
-              },[
-                h('div',{
-                  class:{
-                    member_operate_div: true
-                  }
-                },[h(
-                  "Button",
+          render: (h, params) => {
+            return (
+              "div",
+              [
+                h(
+                  "Dropdown",
                   {
-                    props: {
-                      type: "warning",
-                      size: "small"
-                    },
-                    style: {
-                      marginRight: "5px"
-                    }
-                  },["账户操作",
-                    h('Icon',{
-                      props:{
-                        type: 'arrow-down-b'
+                    on: {
+                      "on-click": value => {
+                        this.edit(params.row, value);
                       }
-                    })]
-                )]),
-                // h('a',{},'下拉'),
-                h('DropdownMenu',{
-                  slot:'list'
-                },[
-                  h('DropdownItem',{
-                    props:{
-                      name: '充值'
                     }
-                  },'充值'),
-                  h('DropdownItem',{
-                    props:{
-                      name: '消费'
-                    }
-                  },'消费'),
-                ])
-              ])
-            // ,              h(
-            //     "Button",
-            //     {
-            //       props: {
-            //         type: "warning",
-            //         size: "small"
-            //       },
-            //       style: {
-            //         marginRight: "5px"
-            //       },
-            //       on: {
-            //         click: () => {
-            //           this.editPerm(params.row);
-            //         }
-            //       }
-            //     },
-            //     "分配权限"
-            //   ),
-              // h(
-              //   "Button",
-              //   {
-              //     props: {
-              //       type: "primary",
-              //       size: "small"
-              //     },
-              //     style: {
-              //       marginRight: "5px"
-              //     },
-              //     on: {
-              //       click: () => {
-              //         this.edit(params.row);
-              //       }
-              //     }
-              //   },
-              //   "编辑"
-              // ),
-              // h(
-              //   "Button",
-              //   {
-              //     props: {
-              //       type: "error",
-              //       size: "small"
-              //     },
-              //     on: {
-              //       click: () => {
-              //         this.remove(params.row);
-              //       }
-              //     }
-              //   },
-              //   "删除"
-              // )
-            ])
-          }},
+                  },
+                  [
+                    h(
+                      "div",
+                      {
+                        class: {
+                          member_operate_div: true
+                        }
+                      },
+                      [
+                        h(
+                          "Button",
+                          {
+                            props: {
+                              type: "warning",
+                              size: "small"
+                            },
+                            style: {
+                              marginRight: "5px"
+                            }
+                          },
+                          [
+                            "账户操作",
+                            h("Icon", {
+                              props: {
+                                type: "arrow-down-b"
+                              }
+                            })
+                          ]
+                        )
+                      ]
+                    ),
+                    // h('a',{},'下拉'),
+                    h(
+                      "DropdownMenu",
+                      {
+                        slot: "list"
+                      },
+                      [
+                        h(
+                          "DropdownItem",
+                          {
+                            props: {
+                              name: "充值"
+                            }
+                          },
+                          "充值"
+                        ),
+                        h(
+                          "DropdownItem",
+                          {
+                            props: {
+                              name: "消费"
+                            }
+                          },
+                          "消费"
+                        )
+                      ]
+                    )
+                  ]
+                )
+                // ,              h(
+                //     "Button",
+                //     {
+                //       props: {
+                //         type: "warning",
+                //         size: "small"
+                //       },
+                //       style: {
+                //         marginRight: "5px"
+                //       },
+                //       on: {
+                //         click: () => {
+                //           this.editPerm(params.row);
+                //         }
+                //       }
+                //     },
+                //     "分配权限"
+                //   ),
+                // h(
+                //   "Button",
+                //   {
+                //     props: {
+                //       type: "primary",
+                //       size: "small"
+                //     },
+                //     style: {
+                //       marginRight: "5px"
+                //     },
+                //     on: {
+                //       click: () => {
+                //         this.edit(params.row);
+                //       }
+                //     }
+                //   },
+                //   "编辑"
+                // ),
+                // h(
+                //   "Button",
+                //   {
+                //     props: {
+                //       type: "error",
+                //       size: "small"
+                //     },
+                //     on: {
+                //       click: () => {
+                //         this.remove(params.row);
+                //       }
+                //     }
+                //   },
+                //   "删除"
+                // )
+              ]
+            );
+          }
+        }
       ],
       data: [],
       pageNumber: 1,
@@ -309,10 +398,11 @@ export default {
         current: this.pageNumber,
         size: this.pageSize,
         asc: false,
-        descs:"registerTime",
-        username:undefined,
-        mobile:undefined,
+        descs: "registerTime",
+        username: undefined,
+        mobile: undefined
       },
+      restMoney:0
     };
   },
   methods: {
@@ -335,12 +425,15 @@ export default {
       }
       this.getRoleList();
     },
+    cardChange(e){
+      console.log(e)
+    },
     loadData() {
+      var that=this;
       this.loading = true;
       this.getRequest("/members", this.searchForm).then(res => {
-        console.log(res)
-        this.loading = false;
-        if (res.status === 200) {
+        that.loading = false;
+        if (res.status == 200) {
           this.data = res.data.records;
           this.total = res.data.total;
         }
@@ -351,8 +444,8 @@ export default {
       let that = this;
       permData.forEach(function(e) {
         if (e.status === 1) {
-          e.title += "(已禁用)"
-          e.disabled = true
+          e.title += "(已禁用)";
+          e.disabled = true;
         }
         if (e.children && e.children.length > 0) {
           that.deleteDisableNode(e.children);
@@ -383,6 +476,12 @@ export default {
     submitEdit() {
       this.$refs.editForm.validate(valid => {
         if (valid) {
+          this.editForm.nideshopTrade.cardId=this.cardOptions[this.selectCard].id;
+          this.editForm.nideshopTrade.cardName=this.cardOptions[this.selectCard].cardName;
+          if(this.editForm.nideshopTrade.cardId==null){
+            this.$Message.error("请选择会员卡");
+            return;
+          }
           this.submitLoading = true;
           this.postBodyRequest("/trades", this.editForm).then(res => {
             this.submitLoading = false;
@@ -390,7 +489,7 @@ export default {
               this.$Message.success("操作成功");
               this.init();
               this.editModalVisible = false;
-              this.editForm.nideshopTrade.tradeMoney=1
+              this.editForm.nideshopTrade.tradeMoney = 1;
             }
           });
         }
@@ -405,25 +504,31 @@ export default {
       };
       this.roleModalVisible = true;
     },
-    edit(v,n) {
+    edit(v, n) {
       this.modalType = 1;
       this.editTitle = n;
-      // 转换null为""
-      for (let attr in v) {
-        if (v[attr] === null) {
-          v[attr] = "";
+      this.selectCard='';
+      this.restMoney=0
+      this.editForm.nideshopTrade={};
+      this.editForm.nideshopTrade.memberName = v.username;
+      this.editForm.nideshopTrade.memberId = v.id;
+      this.editForm.nideshopTrade.openid = v.weixinOpenid;
+      this.editForm.nideshopTrade.memberPhoneNumber = v.mobile;
+      let params={}
+      params.current=1;
+      params.size=10;
+      params.openid=v.weixinOpenid;
+      this.getRequest("/membercards",params).then(res=>{
+        this.cardOptions=[]
+        var list=res.data.records;
+        for(var i=0 ;i<list.length;i++){
+          this.cardOptions.push(list[i])
         }
-      }
-      this.editForm.nideshopTrade.memberName=v.nickname;
-      this.editForm.nideshopTrade.memberId=v.id;
-      this.editForm.nideshopTrade.openid=v.weixinOpenid
-      this.editForm.nideshopTrade.memberPhoneNumber=v.mobile;
-
-      if(n=="充值"){
-        this.editForm.nideshopTrade.tradeType="线下充值";
-      }
-      else{
-        this.editForm.nideshopTrade.tradeType="线下消费";
+      })
+      if (n == "充值") {
+        this.editForm.nideshopTrade.tradeType = "线下充值";
+      } else {
+        this.editForm.nideshopTrade.tradeType = "线下消费";
       }
       this.editModalVisible = true;
     },
@@ -545,15 +650,15 @@ export default {
     },
     // 全选反选
     selectTreeAll() {
-      this.selectAllFlag = !this.selectAllFlag
-      let select = this.selectAllFlag
-      this.selectedTreeAll(this.permData, select)
+      this.selectAllFlag = !this.selectAllFlag;
+      let select = this.selectAllFlag;
+      this.selectedTreeAll(this.permData, select);
     },
     // 递归全选节点
     selectedTreeAll(permData, select) {
       let that = this;
       permData.forEach(function(e) {
-        e.selected = select
+        e.selected = select;
         if (e.children && e.children.length > 0) {
           that.selectedTreeAll(e.children, select);
         }
@@ -603,10 +708,20 @@ export default {
         this.dropDownIcon = "chevron-up";
       }
       this.drop = !this.drop;
-    },
+    }
   },
   mounted() {
     this.init();
-  }
+  },
+  watch:{
+    selectCard(curVal,oldVal){
+          var item=this.cardOptions[curVal]
+          if(item){
+          this.restMoney=item.restMoney
+          }
+
+      }
+    }
+  
 };
 </script>
