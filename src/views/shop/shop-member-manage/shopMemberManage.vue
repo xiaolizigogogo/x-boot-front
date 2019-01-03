@@ -482,6 +482,9 @@ export default {
             this.$Message.error("请选择会员卡");
             return;
           }
+          if(this.editForm.nideshopTrade.tradeMoney==null){
+            this.$Message.error("请填写金额")
+          }
           this.submitLoading = true;
           this.postBodyRequest("/trades", this.editForm).then(res => {
             this.submitLoading = false;
