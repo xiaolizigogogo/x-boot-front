@@ -411,11 +411,11 @@ export default {
     },
     changePage(v) {
       this.pageNumber = v;
-      this.getRoleList();
+      this.loadData();
     },
     changePageSize(v) {
       this.pageSize = v;
-      this.getRoleList();
+      this.loadData();
     },
     changeSort(e) {
       this.sortColumn = e.key;
