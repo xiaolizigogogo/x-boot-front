@@ -318,7 +318,8 @@ export default {
     },
     loadData() {
       this.loading = true;
-
+     this.searchForm.current=this.pageNumber;
+      this.searchForm.size=this.pageSize;
       this.getRequest("/subscribes", this.searchForm).then(res => {
         this.loading = false;
         if (res.status === 200) {
