@@ -431,6 +431,8 @@ export default {
     loadData() {
       var that=this;
       this.loading = true;
+      this.searchForm.current=this.pageNumber;
+      this.searchForm.size=this.pageSize;
       this.getRequest("/members", this.searchForm).then(res => {
         that.loading = false;
         if (res.status == 200) {
